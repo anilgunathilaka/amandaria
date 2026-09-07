@@ -1,0 +1,11 @@
+<div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+  <nav class="mobile-menu__nav" aria-label="Mobile">
+    {{#each nav.links}}
+      <a class="mobile-menu__link" href="{{this.href}}">{{this.label}}</a>
+    {{/each}}
+  </nav>
+  <div class="mobile-menu__footer">
+    <a class="mobile-menu__footer-link" href="{{nav.cta.href}}">{{nav.cta.label}}</a>
+    <a class="mobile-menu__footer-link" href="{{nav.mobileExtra.href}}">{{nav.mobileExtra.label}}</a>
+  </div>
+</div>

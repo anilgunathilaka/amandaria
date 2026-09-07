@@ -1,0 +1,24 @@
+<section class="final-cta" id="final-cta" aria-labelledby="final-cta-heading">
+  <div class="topo-field topo-field--photo" aria-hidden="true">
+    <img
+      class="media-fill"
+      src="{{finalCta.image.src}}"
+      alt=""
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+  <div class="final-cta__scrim" aria-hidden="true"></div>
+
+  <div class="final-cta__content">
+    <h2 id="final-cta-heading" class="final-cta__heading">
+      {{#each finalCta.headingLines}}{{this}}{{#unless @last}}<br />{{/unless}}{{/each}}
+    </h2>
+    <p class="final-cta__body">{{finalCta.body}}</p>
+    <div class="final-cta__ctas">
+      <a class="btn btn--primary" href="{{finalCta.primaryCta.href}}">{{finalCta.primaryCta.label}}</a>
+      <a class="btn" href="{{finalCta.secondaryCta.href}}">{{finalCta.secondaryCta.label}}</a>
+    </div>
+    <p class="final-cta__callout">{{finalCta.callout}}</p>
+  </div>
+</section>

@@ -1,0 +1,38 @@
+<section class="hero" id="top">
+  <div class="topo-field topo-field--photo" aria-hidden="true">
+    <img
+      class="media-fill hero__image"
+      src="{{hero.image.src}}"
+      alt=""
+      fetchpriority="high"
+      decoding="async"
+    />
+  </div>
+  <div class="hero__scrim" aria-hidden="true"></div>
+
+  <div class="hero__content">
+    <span class="hero__eyebrow eyebrow">{{hero.eyebrow}}</span>
+
+    <div class="hero__bottom">
+      <h1 class="hero__title">
+        {{#each hero.titleLines}}
+          {{this}}{{#unless @last}}<br />{{/unless}}
+        {{/each}}
+      </h1>
+      <p class="hero__subtitle">{{hero.subtitle}}</p>
+
+      <div class="hero__ctas">
+        <a class="btn btn--primary" href="{{hero.primaryCta.href}}">{{hero.primaryCta.label}}</a>
+        <a class="btn" href="{{hero.secondaryCta.href}}">{{hero.secondaryCta.label}}</a>
+      </div>
+
+      <div class="hero__foot">
+        <span class="scroll-indicator">
+          <span class="scroll-indicator__line" aria-hidden="true"></span>
+          Scroll
+        </span>
+        <span class="hero__coords">{{hero.coordsLine1}}<br />{{hero.coordsLine2}}</span>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,76 @@
+/**
+ * .destination — the full-bleed cinematic interlude for "The Destination".
+ * A wide topographic art field with a scrim, section-intro-style copy,
+ * and a short list of orienting tags along the base.
+ */
+
+.destination {
+  position: relative;
+  min-height: 78vh;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  background: var(--color-surface-deep);
+}
+
+.destination .topo-field {
+  z-index: 0;
+}
+
+.destination .media-fill {
+  object-position: center 45%;
+}
+
+.destination__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    rgb(10 28 40 / 94%) 0%,
+    rgb(10 28 40 / 40%) 50%,
+    rgb(10 28 40 / 20%) 100%
+  );
+}
+
+.destination__content {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: var(--section-padding) var(--content-gutter) clamp(56px, 8vw, 96px);
+}
+
+.destination__intro {
+  max-width: 720px;
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+.destination__tags {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(24px, 4vw, 56px);
+  max-width: var(--content-max-width);
+  border-top: 1px solid var(--color-line);
+  padding-top: clamp(28px, 4vw, 44px);
+}
+
+.destination__tag-label {
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-accent-strong);
+  display: block;
+  margin-bottom: 14px;
+}
+
+.destination__tag-body {
+  max-width: 44ch;
+}
+
+@media (max-width: 720px) {
+  .destination__tags {
+    grid-template-columns: 1fr;
+    gap: clamp(28px, 6vw, 40px);
+  }
+}

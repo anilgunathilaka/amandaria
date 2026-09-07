@@ -1,0 +1,30 @@
+<section class="section section--alt" id="sanctuary" aria-labelledby="sanctuary-heading">
+  <div class="wrap">
+    <div class="section-intro">
+      <span class="eyebrow">{{sanctuary.eyebrow}}</span>
+      <h2 id="sanctuary-heading" class="section-intro__heading heading-2">
+        {{#each sanctuary.headingLines}}{{this}}{{#unless @last}}<br />{{/unless}}{{/each}}
+      </h2>
+      <p class="section-intro__body body-text--lg">{{sanctuary.intro}}</p>
+    </div>
+
+    <div class="sanctuary-list">
+      {{#each sanctuary.items}}
+        <div class="sanctuary-item reveal">
+          <span class="sanctuary-item__index">{{this.index}}</span>
+          <h3 class="sanctuary-item__title">{{this.title}}</h3>
+          <div class="sanctuary-item__media">
+            <img
+              class="media-fill"
+              src="{{this.image.src}}"
+              alt="{{this.image.alt}}"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <p class="sanctuary-item__body body-text">{{this.body}}</p>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+</section>

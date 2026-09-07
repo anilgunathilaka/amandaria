@@ -1,0 +1,47 @@
+/**
+ * .privacy-section — the short, centered "Absolute Privacy" statement,
+ * framed by hairlines with a faint watermark mark behind the copy.
+ */
+
+.privacy-section {
+  text-align: center;
+}
+
+.privacy-section__frame {
+  position: relative;
+  max-width: 760px;
+  margin-inline: auto;
+  padding: clamp(56px, 8vw, 96px) 0;
+  border-top: 1px solid var(--color-line-strong);
+  border-bottom: 1px solid var(--color-line-strong);
+}
+
+.privacy-section__mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(320px, 70%);
+  height: auto;
+  transform: translate(-50%, -50%);
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.privacy-section__eyebrow {
+  position: relative;
+  z-index: 1;
+  justify-content: center;
+}
+
+.privacy-section__heading {
+  position: relative;
+  z-index: 1;
+  margin-top: 22px;
+}
+
+.privacy-section__body {
+  position: relative;
+  z-index: 1;
+  margin: 28px auto 0;
+}

@@ -1,0 +1,57 @@
+/**
+ * pages/home.css — one-off arrangement glue for the "/" route only.
+ * Nothing here is a reusable component; it's spacing between
+ * already-styled primitives/components as they're composed on this
+ * specific page. See CLAUDE.md, layer 4.
+ */
+
+/* Vertical rhythm inside a run of copy paragraphs/blocks. */
+.home-copy > * + * {
+  margin-top: 20px;
+}
+
+/* Heading -> italic sub-heading -> copy block, as used in Aranya and
+   Culinary Journey. */
+.section-intro__heading + .heading-sub {
+  margin-top: 16px;
+}
+
+.heading-sub + .home-copy {
+  margin-top: 24px;
+}
+
+/* Text-link CTAs that follow a tag/theme/material list need their own
+   top margin — .text-link is an inline-flex box, so it does not take
+   part in block margin collapsing with the list above it. */
+.feature-tags + .text-link,
+.culinary-themes + .text-link,
+.material-row + .text-link {
+  margin-top: clamp(28px, 4vw, 40px);
+}
+
+/* Experience section: the small "scroll to follow the day" hint under
+   the centered intro. */
+.experience__hint {
+  margin-top: 18px;
+}
+
+/* The Day timeline is narrower than the full content width and
+   centered under the section intro. */
+.section-intro--center + .timeline {
+  max-width: 1080px;
+  margin: clamp(48px, 7vw, 88px) auto 0;
+}
+
+/* Anchor targets should land clear of the fixed header. */
+#sanctuary,
+#destination,
+#architecture,
+#aranya,
+#experience,
+#culinary,
+#privacy,
+#final-cta,
+#inquiry,
+#footer {
+  scroll-margin-top: 84px;
+}

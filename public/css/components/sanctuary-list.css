@@ -1,0 +1,86 @@
+/**
+ * .sanctuary-list — the editorial four-item list in "The Sanctuary".
+ */
+
+.sanctuary-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.sanctuary-item {
+  display: grid;
+  grid-template-columns: 90px minmax(180px, 240px) 1fr 1.2fr;
+  grid-template-areas: 'index media title body';
+  gap: clamp(20px, 3vw, 48px);
+  align-items: center;
+  padding: clamp(30px, 4vw, 44px) 0;
+  border-top: 1px solid var(--color-line);
+}
+
+.sanctuary-list .sanctuary-item:last-child {
+  border-bottom: 1px solid var(--color-line);
+}
+
+.sanctuary-item__index {
+  grid-area: index;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--color-accent-strong);
+}
+
+.sanctuary-item__media {
+  grid-area: media;
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: var(--color-surface-raised);
+}
+
+.sanctuary-item__media .media-fill {
+  transition: transform 1.8s var(--ease-editorial);
+  transform: scale(1.02);
+}
+
+.sanctuary-item:hover .sanctuary-item__media .media-fill {
+  transform: scale(1.08);
+}
+
+.sanctuary-item__title {
+  grid-area: title;
+  font-size: clamp(1.3rem, 2.4vw, 1.9rem);
+  font-weight: 400;
+}
+
+.sanctuary-item__body {
+  grid-area: body;
+  max-width: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sanctuary-item__media .media-fill,
+  .sanctuary-item:hover .sanctuary-item__media .media-fill {
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .sanctuary-item {
+    grid-template-columns: 72px minmax(140px, 200px) 1fr;
+    grid-template-areas:
+      'index media title'
+      'index media body';
+    align-items: start;
+  }
+}
+
+@media (max-width: 760px) {
+  .sanctuary-item {
+    grid-template-columns: 46px 1fr;
+    grid-template-areas:
+      'index title'
+      'media media'
+      'body body';
+  }
+}

@@ -1,0 +1,59 @@
+/**
+ * .final-cta — the full-bleed closing invitation before the footer.
+ */
+
+.final-cta {
+  position: relative;
+  overflow: hidden;
+  background: var(--color-surface-deep);
+  padding: clamp(120px, 15vw, 200px) var(--content-gutter) clamp(64px, 8vw, 100px);
+  text-align: center;
+}
+
+.final-cta .topo-field {
+  z-index: 0;
+}
+
+.final-cta__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(to bottom, rgb(10 28 40 / 78%), rgb(10 28 40 / 46%));
+}
+
+.final-cta__content {
+  position: relative;
+  z-index: 2;
+  max-width: 900px;
+  margin-inline: auto;
+}
+
+.final-cta__heading {
+  font-size: var(--text-display);
+  font-weight: 300;
+  line-height: var(--leading-tight);
+  letter-spacing: -0.01em;
+}
+
+.final-cta__body {
+  margin: 28px auto 48px;
+  max-width: 52ch;
+  color: var(--color-text-muted);
+}
+
+.final-cta__ctas {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.final-cta__callout {
+  margin-top: clamp(56px, 8vw, 88px);
+  padding-top: 24px;
+  border-top: 1px solid var(--color-line);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--text-sub);
+  color: var(--color-text-muted);
+}

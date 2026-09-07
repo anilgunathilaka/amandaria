@@ -1,0 +1,47 @@
+<section class="section section--deep" id="inquiry" aria-labelledby="inquiry-heading">
+  <div class="wrap split split--40-60">
+    <div>
+      <span class="eyebrow">{{inquiryForm.eyebrow}}</span>
+      <h2 id="inquiry-heading" class="section-intro__heading heading-2">{{inquiryForm.heading}}</h2>
+      <p class="inquiry-form__note home-copy">{{inquiryForm.note}}</p>
+    </div>
+
+    <div class="inquiry-panel" id="inquiryPanel">
+      <form class="inquiry-form" id="inquiryForm" novalidate>
+        <div class="inquiry-form__row">
+          <div class="inquiry-form__field">
+            <label class="inquiry-form__label" for="inquiryName">{{inquiryForm.fields.name}}</label>
+            <input class="inquiry-form__input" type="text" id="inquiryName" name="name" required autocomplete="name" />
+          </div>
+          <div class="inquiry-form__field">
+            <label class="inquiry-form__label" for="inquiryEmail">{{inquiryForm.fields.email}}</label>
+            <input class="inquiry-form__input" type="email" id="inquiryEmail" name="email" required autocomplete="email" />
+          </div>
+        </div>
+
+        <div class="inquiry-form__row">
+          <div class="inquiry-form__field">
+            <label class="inquiry-form__label" for="inquiryArrival">{{inquiryForm.fields.arrival}}</label>
+            <input class="inquiry-form__input" type="date" id="inquiryArrival" name="arrival" />
+          </div>
+          <div class="inquiry-form__field">
+            <label class="inquiry-form__label" for="inquiryDeparture">{{inquiryForm.fields.departure}}</label>
+            <input class="inquiry-form__input" type="date" id="inquiryDeparture" name="departure" />
+          </div>
+        </div>
+
+        <div class="inquiry-form__field">
+          <label class="inquiry-form__label" for="inquiryMessage">{{inquiryForm.fields.message}}</label>
+          <textarea class="inquiry-form__textarea" id="inquiryMessage" name="message"></textarea>
+        </div>
+
+        <button class="btn btn--primary inquiry-form__submit" type="submit">{{inquiryForm.submitLabel}}</button>
+      </form>
+
+      <div class="inquiry-form__success">
+        <h3 class="inquiry-form__success-heading">{{inquiryForm.successHeading}}</h3>
+        <p class="inquiry-form__success-body body-text">{{inquiryForm.successBody}}</p>
+      </div>
+    </div>
+  </div>
+</section>

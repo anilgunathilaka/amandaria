@@ -1,0 +1,105 @@
+/**
+ * .inquiry-panel — the "Private Inquiry" split: framing copy on one
+ * side, the .inquiry-form fields on the other, with an .inquiry-form__success
+ * state swapped in by JS after submission.
+ */
+
+.inquiry-panel {
+  position: relative;
+}
+
+.inquiry-form {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(22px, 3vw, 30px);
+}
+
+.inquiry-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(20px, 3vw, 28px);
+}
+
+.inquiry-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.inquiry-form__label {
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+}
+
+.inquiry-form__input,
+.inquiry-form__textarea {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--color-line-strong);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  font-size: var(--text-body-lg);
+  padding: 10px 2px;
+  transition: border-color var(--duration-base) var(--ease-editorial);
+}
+
+.inquiry-form__input::placeholder,
+.inquiry-form__textarea::placeholder {
+  color: var(--color-text-soft);
+}
+
+.inquiry-form__input:focus,
+.inquiry-form__textarea:focus {
+  outline: none;
+  border-color: var(--color-accent-strong);
+}
+
+.inquiry-form__textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.inquiry-form__note {
+  font-size: 12.5px;
+  line-height: 1.8;
+  color: var(--color-text-soft);
+  max-width: 46ch;
+}
+
+.inquiry-form__submit {
+  margin-top: 8px;
+  align-self: flex-start;
+}
+
+.inquiry-form__success {
+  display: none;
+  text-align: center;
+  padding: clamp(48px, 7vw, 84px) 0;
+}
+
+.inquiry-panel.is-success .inquiry-form {
+  display: none;
+}
+
+.inquiry-panel.is-success .inquiry-form__success {
+  display: block;
+}
+
+.inquiry-form__success-heading {
+  font-size: var(--text-h3);
+}
+
+.inquiry-form__success-body {
+  margin: 18px auto 0;
+  max-width: 46ch;
+}
+
+@media (max-width: 640px) {
+  .inquiry-form__row {
+    grid-template-columns: 1fr;
+  }
+}

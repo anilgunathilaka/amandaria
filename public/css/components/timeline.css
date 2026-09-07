@@ -1,0 +1,109 @@
+/**
+ * .timeline — the vertical "Day Without a Schedule" itinerary.
+ */
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+}
+
+.timeline__item {
+  display: grid;
+  grid-template-columns: 84px 20px 1fr minmax(180px, 280px);
+  gap: clamp(20px, 3vw, 40px);
+  padding-bottom: clamp(44px, 6vw, 72px);
+  position: relative;
+  align-items: start;
+}
+
+.timeline__item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline__rail {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.timeline__dot {
+  width: 7px;
+  height: 7px;
+  margin-top: 8px;
+  border-radius: 50%;
+  background: var(--color-accent-strong);
+  position: relative;
+  z-index: 2;
+  flex: none;
+}
+
+.timeline__line {
+  position: absolute;
+  top: 18px;
+  bottom: -44px;
+  left: 50%;
+  width: 1px;
+  background: var(--color-line-strong);
+  transform: translateX(-50%);
+}
+
+.timeline__item:last-child .timeline__line {
+  display: none;
+}
+
+.timeline__time {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--color-text-muted);
+  padding-top: 2px;
+}
+
+.timeline__title {
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  font-weight: 400;
+  margin-bottom: 12px;
+}
+
+.timeline__body {
+  max-width: 52ch;
+}
+
+.timeline__media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--color-surface-raised);
+}
+
+.timeline__media .media-fill {
+  transition: transform 1.8s var(--ease-editorial);
+  transform: scale(1.02);
+}
+
+.timeline__item:hover .timeline__media .media-fill {
+  transform: scale(1.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timeline__media .media-fill,
+  .timeline__item:hover .timeline__media .media-fill {
+    transform: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .timeline__item {
+    grid-template-columns: 58px 16px 1fr;
+    gap: 18px;
+  }
+
+  .timeline__media {
+    grid-column: 1 / -1;
+  }
+
+  .timeline__time {
+    font-size: 0.92rem;
+  }
+}

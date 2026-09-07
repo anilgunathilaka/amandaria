@@ -1,0 +1,64 @@
+/**
+ * .art-panel — the recurring framed photograph used beside section copy.
+ */
+
+.art-panel {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--color-surface-raised);
+}
+
+.art-panel--wide {
+  aspect-ratio: 16 / 10;
+}
+
+.art-panel--tall {
+  aspect-ratio: 3 / 4;
+}
+
+.art-panel .topo-field {
+  transform: scale(1.02);
+  transition: transform 1.8s var(--ease-editorial);
+}
+
+.art-panel:hover .topo-field {
+  transform: scale(1.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .art-panel .topo-field,
+  .art-panel:hover .topo-field {
+    transform: none;
+    transition: none;
+  }
+}
+
+.art-panel__frame {
+  position: absolute;
+  inset: 14px;
+  border: 1px solid rgb(243 239 230 / 16%);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.art-panel__caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  padding: 26px 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  background: linear-gradient(to top, rgb(10 28 40 / 65%), transparent);
+}
+
+.art-panel__caption-text {
+  color: var(--color-text-muted);
+}
+
+.art-panel__caption-tag {
+  color: var(--color-accent-strong);
+}

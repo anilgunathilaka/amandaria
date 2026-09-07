@@ -1,0 +1,99 @@
+/**
+ * .btn — the primary call-to-action button.
+ * .text-link — an inline arrow-link (used inside copy blocks).
+ */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-sans);
+  font-size: var(--text-eyebrow);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  padding: 17px 30px;
+  border: 1px solid var(--color-line-strong);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  transition:
+    border-color var(--duration-base) var(--ease-editorial),
+    background-color var(--duration-base) var(--ease-editorial),
+    color var(--duration-base) var(--ease-editorial);
+  white-space: nowrap;
+}
+
+.btn:hover {
+  border-color: var(--color-accent-strong);
+  background: rgb(194 166 97 / 8%);
+}
+
+.btn--primary {
+  background: var(--color-text);
+  color: var(--color-on-accent);
+  border-color: var(--color-text);
+}
+
+.btn--primary:hover {
+  background: var(--color-accent-strong);
+  border-color: var(--color-accent-strong);
+  color: var(--color-on-accent);
+}
+
+.btn--small {
+  font-size: 10.5px;
+  padding: 11px 20px;
+}
+
+.btn--block {
+  width: 100%;
+  justify-content: center;
+}
+
+.btn__icon {
+  width: 13px;
+  height: 9px;
+  transition: transform var(--duration-fast) var(--ease-editorial);
+  flex: none;
+}
+
+.btn:hover .btn__icon {
+  transform: translateX(5px);
+}
+
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--text-eyebrow);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text);
+  padding-bottom: 6px;
+  position: relative;
+}
+
+.text-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 100%;
+  bottom: 0;
+  height: 1px;
+  background: var(--color-accent-strong);
+  transition: right var(--duration-base) var(--ease-editorial);
+}
+
+.text-link:hover::after {
+  right: 0;
+}
+
+.text-link .btn__icon {
+  transition: transform var(--duration-fast) var(--ease-editorial);
+}
+
+.text-link:hover .btn__icon {
+  transform: translateX(5px);
+}

@@ -1,0 +1,35 @@
+<section class="section section--deep" id="experience" aria-labelledby="experience-heading">
+  <div class="wrap">
+    <div class="section-intro section-intro--center">
+      <span class="eyebrow eyebrow--center">{{experience.eyebrow}}</span>
+      <h2 id="experience-heading" class="section-intro__heading heading-2">{{experience.heading}}</h2>
+      <p class="section-intro__body heading-sub">{{experience.subheading}}</p>
+      <p class="label-sm experience__hint">{{experience.hint}}</p>
+    </div>
+
+    <div class="timeline">
+      {{#each experience.items}}
+        <div class="timeline__item reveal">
+          <span class="timeline__time">{{this.time}}</span>
+          <div class="timeline__rail">
+            <span class="timeline__dot" aria-hidden="true"></span>
+            <span class="timeline__line" aria-hidden="true"></span>
+          </div>
+          <div>
+            <h3 class="timeline__title">{{this.title}}</h3>
+            <p class="timeline__body body-text">{{this.body}}</p>
+          </div>
+          <div class="timeline__media">
+            <img
+              class="media-fill"
+              src="{{this.image.src}}"
+              alt="{{this.image.alt}}"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+</section>

@@ -1,0 +1,39 @@
+<section class="section section--alt" id="aranya" aria-labelledby="aranya-heading">
+  <div class="wrap split split--55-45">
+    <div class="art-panel art-panel--tall reveal order-2-mobile">
+      <div class="topo-field topo-field--photo">
+        <img
+          class="media-fill"
+          src="{{aranya.image.src}}"
+          alt="{{aranya.image.alt}}"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <div class="art-panel__frame"></div>
+      <div class="art-panel__caption">
+        <span class="art-panel__caption-text">{{aranya.panelCaption}}</span>
+      </div>
+    </div>
+
+    <div>
+      <span class="eyebrow">{{aranya.eyebrow}}</span>
+      <h2 id="aranya-heading" class="section-intro__heading heading-2">{{aranya.heading}}</h2>
+      <p class="heading-sub">{{aranya.subheading}}</p>
+      <div class="home-copy">
+        <p class="body-text body-text--lg">{{aranya.body}}</p>
+      </div>
+      <div class="feature-tags">
+        {{#each aranya.features}}
+          <span class="feature-tags__item">{{this}}</span>
+        {{/each}}
+      </div>
+      <a class="text-link" href="{{aranya.cta.href}}">
+        {{aranya.cta.label}}
+        <svg class="btn__icon" viewBox="0 0 13 9" fill="none" aria-hidden="true">
+          <path d="M0 4.5H12M12 4.5L8 0.5M12 4.5L8 8.5" stroke="currentColor" />
+        </svg>
+      </a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,33 @@
+<footer class="site-footer" id="footer">
+  <div class="wrap">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <img
+          class="site-footer__mark"
+          src="{{nav.logoSrc}}"
+          alt="{{nav.logoName}} — {{nav.logoSubtitle}}"
+          width="220"
+          height="auto"
+        />
+        <p class="site-footer__tagline">{{footer.brandTagline}}</p>
+        <p class="site-footer__statement">{{footer.closingStatement}}</p>
+      </div>
+
+      {{#each footer.groups}}
+        <div class="site-footer__group">
+          <h3 class="site-footer__group-heading">{{this.heading}}</h3>
+          <div class="site-footer__links">
+            {{#each this.links}}
+              <a class="site-footer__link" href="{{this.href}}">{{this.label}}</a>
+            {{/each}}
+          </div>
+        </div>
+      {{/each}}
+    </div>
+
+    <div class="site-footer__bottom">
+      <span class="site-footer__copyright">&copy; {{year}} {{nav.logoName}}. All rights reserved.</span>
+      <a class="site-footer__email" href="mailto:{{footer.email}}">{{footer.email}}</a>
+    </div>
+  </div>
+</footer>

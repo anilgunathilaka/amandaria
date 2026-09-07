@@ -1,0 +1,33 @@
+<header class="site-header" id="siteHeader">
+  <a class="logo" href="#top">
+    <img
+      class="logo__image"
+      src="{{nav.logoSrc}}"
+      alt="{{nav.logoName}} — {{nav.logoSubtitle}}"
+      width="180"
+      height="90"
+    />
+  </a>
+
+  <nav class="primary-nav" aria-label="Primary">
+    {{#each nav.links}}
+      <a class="primary-nav__link" href="{{this.href}}">{{this.label}}</a>
+    {{/each}}
+  </nav>
+
+  <div class="site-header__actions">
+    <a class="btn btn--primary btn--small" href="{{nav.cta.href}}">{{nav.cta.label}}</a>
+    <button
+      class="menu-toggle"
+      id="menuToggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="mobileMenu"
+      aria-label="Open menu"
+    >
+      <span class="menu-toggle__bar" aria-hidden="true"></span>
+      <span class="menu-toggle__bar" aria-hidden="true"></span>
+      <span class="menu-toggle__bar" aria-hidden="true"></span>
+    </button>
+  </div>
+</header>

@@ -1,0 +1,31 @@
+<section class="destination" id="destination" aria-labelledby="destination-heading">
+  <div class="topo-field topo-field--photo" aria-hidden="true">
+    <img
+      class="media-fill"
+      src="{{destination.image.src}}"
+      alt=""
+      loading="lazy"
+      decoding="async"
+    />
+  </div>
+  <div class="destination__scrim" aria-hidden="true"></div>
+
+  <div class="destination__content">
+    <div class="destination__intro section-intro">
+      <span class="eyebrow">{{destination.eyebrow}}</span>
+      <h2 id="destination-heading" class="section-intro__heading heading-2">
+        {{#each destination.headingLines}}{{this}}{{#unless @last}}<br />{{/unless}}{{/each}}
+      </h2>
+      <p class="section-intro__body body-text--lg">{{destination.intro}}</p>
+    </div>
+
+    <div class="destination__tags">
+      {{#each destination.tags}}
+        <div class="reveal">
+          <span class="destination__tag-label">{{this.label}}</span>
+          <p class="destination__tag-body body-text">{{this.body}}</p>
+        </div>
+      {{/each}}
+    </div>
+  </div>
+</section>

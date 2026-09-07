@@ -1,0 +1,43 @@
+/**
+ * Color tokens.
+ * Raw palette values (sampled from the Amandaria brand mark) plus a
+ * semantic layer on top. Everything outside this file should reach for
+ * the --color-* semantic names, never the raw --palette-* values.
+ */
+
+:root {
+  /* ---- Raw palette --------------------------------------------- */
+  --palette-navy: #163e55;
+  --palette-navy-light: #1f4c68;
+  --palette-charcoal: #122e42;
+  --palette-ink: #0a1c28;
+
+  --palette-ivory: #f3efe6;
+  --palette-mist: #d3d9db;
+  --palette-stone: #a3afb4;
+
+  --palette-gold: #d9c27c;
+  --palette-gold-deep: #c2a661;
+
+  /* ---- Semantic surfaces ------------------------------------------ */
+  --color-surface: var(--palette-navy);
+  --color-surface-raised: var(--palette-navy-light);
+  --color-surface-alt: var(--palette-charcoal);
+  --color-surface-deep: var(--palette-ink);
+
+  /* ---- Semantic text ----------------------------------------------- */
+  --color-text: var(--palette-ivory);
+  --color-text-muted: var(--palette-mist);
+  --color-text-soft: var(--palette-stone);
+
+  /* ---- Semantic accent --------------------------------------------- */
+  --color-accent: var(--palette-gold-deep);
+  --color-accent-strong: var(--palette-gold);
+
+  /* ---- Borders / dividers ------------------------------------------ */
+  --color-line: rgb(211 217 219 / 14%);
+  --color-line-strong: rgb(211 217 219 / 24%);
+
+  /* ---- Interactive on light surfaces (e.g. solid ivory buttons) --- */
+  --color-on-accent: var(--palette-ink);
+}

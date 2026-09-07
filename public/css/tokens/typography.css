@@ -1,0 +1,31 @@
+/**
+ * Typography tokens: font stacks + a fluid type scale.
+ * Two families only — an editorial serif for display type, a clean
+ * sans for everything functional (nav, labels, body, buttons).
+ */
+
+:root {
+  --font-serif: 'Cormorant Garamond', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+  --font-sans: 'Manrope', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Fluid type scale — clamp(min, preferred, max) */
+  --text-display: clamp(2.6rem, 6vw, 5.4rem);
+  --text-h1: clamp(2.3rem, 3.4vw + 3.2svh, 5.4rem);
+  --text-h2: clamp(2rem, 4.4vw, 3.4rem);
+  --text-h3: clamp(1.3rem, 2.4vw, 1.9rem);
+  --text-sub: clamp(1.3rem, 2.4vw, 1.7rem);
+  --text-statement: clamp(1.5rem, 3.1vw, 2.3rem);
+  --text-body-lg: clamp(1rem, 1.3vw, 1.15rem);
+  --text-body: 0.98rem;
+  --text-label: 11px;
+  --text-eyebrow: 11.5px;
+
+  --leading-tight: 1.06;
+  --leading-snug: 1.12;
+  --leading-normal: 1.7;
+  --leading-relaxed: 1.85;
+
+  --tracking-label: 0.22em;
+  --tracking-eyebrow: 0.32em;
+  --tracking-nav: 0.14em;
+}

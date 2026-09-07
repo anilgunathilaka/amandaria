@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{meta.title}}</title>
+  <meta name="description" content="{{meta.description}}" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  {{> head-styles}}
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  {{{body}}}
+
+  <div class="grain-overlay" aria-hidden="true"></div>
+  <script src="/js/main.js" defer></script>
+</body>
+</html>
