@@ -1,11 +1,6 @@
-import 'reflect-metadata';
-import { NestFactory } from '@nestjs/core';
-import { NestExpressApplication } from '@nestjs/platform-express';
-import { engine } from 'express-handlebars';
 import { createServer } from 'net';
 import { join } from 'path';
-import { AppModule } from './app.module';
-import { hbsHelpers } from './handlebars/helpers';
+import { createApp } from './create-app';
 
 const DEFAULT_PORT = 3000;
 const PORT_SCAN_ATTEMPTS = 10;
@@ -39,25 +34,8 @@ async function resolvePort(preferred: number): Promise<number> {
 }
 
 async function bootstrap(): Promise<void> {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-
-  // Static assets: CSS / JS / images live in /public and are served as-is —
-  // no bundler, no build step for the frontend.
-  app.useStaticAssets(join(__dirname, '..', 'public'));
-
-  // Views: layouts + partials + pages, all plain Handlebars (.hbs).
-  app.engine(
-    'hbs',
-    engine({
-      extname: '.hbs',
-      defaultLayout: 'main',
-      layoutsDir: join(__dirname, '..', 'views', 'layouts'),
-      partialsDir: join(__dirname, '..', 'views', 'partials'),
-      helpers: hbsHelpers,
-    }),
-  );
-  app.setViewEngine('hbs');
-  app.setBaseViewsDir(join(__dirname, '..', 'views'));
+  // `dist/main.js` sits one level below the project root that holds views/public.
+  const app = await createApp(join(__dirname, '..'));
 
   const port = await resolvePort(
     process.env.PORT ? Number(process.env.PORT) : DEFAULT_PORT,
