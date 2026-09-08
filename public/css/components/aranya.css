@@ -1,0 +1,37 @@
+/**
+ * .aranya — river pavilion copy beside a framed photograph.
+ * Heading and feature tags sit on the left edge; the italic line
+ * and body share a single indent underneath.
+ */
+
+.aranya__copy .heading-2 {
+  margin-top: var(--space-5);
+}
+
+.aranya__body {
+  margin-left: clamp(2rem, 5.5vw, 4.75rem);
+}
+
+.aranya__body .heading-sub {
+  margin-top: var(--space-5);
+  font-style: italic;
+}
+
+.aranya__body .body-text {
+  margin-top: var(--space-5);
+}
+
+.aranya__copy .feature-tags {
+  margin-top: clamp(40px, 6vw, 72px);
+}
+
+.aranya__media {
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .aranya__media {
+    will-change: auto;
+    transform: none;
+  }
+}

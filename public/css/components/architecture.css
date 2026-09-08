@@ -1,0 +1,206 @@
+/**
+ * .architecture — heading at the top left; material list and landscape
+ * photograph sit together on the row below, image flush right.
+ */
+
+.architecture {
+  --architecture-indent: clamp(2rem, 5.5vw, 4.75rem);
+  --architecture-gap: clamp(24px, 3vw, 48px);
+  --architecture-list-inset: clamp(1.5rem, 4vw, 3.25rem);
+  display: grid;
+  grid-template-columns: minmax(0, 0.4fr) minmax(0, 0.6fr);
+  grid-template-areas:
+    'intro media'
+    'list media';
+  align-items: center;
+  column-gap: var(--architecture-gap);
+  row-gap: clamp(28px, 4vw, 48px);
+  min-height: 0;
+  padding-block: var(--section-padding);
+  padding-bottom: calc(var(--section-padding) + 8vw);
+  padding-left: 0;
+  padding-right: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--color-surface-light);
+}
+
+.architecture__intro,
+.architecture__list {
+  color: var(--color-on-light);
+  --color-text: var(--color-on-light);
+  --color-text-muted: var(--color-on-light-muted);
+}
+
+.architecture__intro {
+  grid-area: intro;
+  padding-left: var(--content-gutter);
+  padding-right: clamp(12px, 2vw, 32px);
+  will-change: transform;
+}
+
+.architecture__intro .heading-2 {
+  margin-top: var(--space-5);
+}
+
+.architecture__body {
+  margin-left: var(--architecture-indent);
+}
+
+.architecture__intro .statement {
+  margin-top: var(--space-5);
+  max-width: 28ch;
+  font-size: var(--text-sub);
+}
+
+.architecture__intro .body-text {
+  margin-top: var(--space-5);
+}
+
+.architecture__list {
+  grid-area: list;
+  align-self: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  position: relative;
+  z-index: 2;
+  width: calc(100% + var(--architecture-gap) + 7vw);
+  max-width: none;
+  margin: 0;
+  padding-left: calc(
+    var(--content-gutter) + var(--architecture-indent) +
+      var(--architecture-list-inset)
+  );
+  padding-right: 0;
+  overflow: visible;
+}
+
+.architecture__list > li {
+  overflow: visible;
+}
+
+.architecture__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-2) 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-on-light);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.architecture__swatch {
+  flex: none;
+  /* Keep the original swatch mixes; the copy pane remaps --color-text-muted
+     to navy, which would wash Glass out on the light field. */
+  --color-text-muted: var(--color-text-soft);
+}
+
+.architecture__item::after {
+  content: '';
+  flex: 1 1 auto;
+  height: 1px;
+  background: currentColor;
+  opacity: 0;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition:
+    opacity var(--duration-base) var(--ease-editorial),
+    transform var(--duration-base) var(--ease-editorial);
+}
+
+.architecture__item:hover::after,
+.architecture__item.is-active::after {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+.architecture__media {
+  grid-area: media;
+  align-self: center;
+  justify-self: end;
+  position: relative;
+  z-index: 3;
+  width: 90%;
+  min-height: 0;
+  margin-right: 0;
+  transform: translateY(20%);
+}
+
+.architecture__media .media-fill {
+  height: 124%;
+  top: -12%;
+  bottom: auto;
+  will-change: transform, opacity;
+  transition: opacity var(--duration-fast) var(--ease-editorial);
+}
+
+.architecture__media .media-fill.is-fading {
+  opacity: 0;
+}
+
+.architecture__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    rgb(10 28 40 / 28%) 0%,
+    rgb(10 28 40 / 4%) 55%,
+    transparent 100%
+  );
+  will-change: opacity;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .architecture__intro,
+  .architecture__media .media-fill,
+  .architecture__scrim {
+    will-change: auto;
+    transform: none;
+    opacity: 1;
+    transition: none;
+  }
+
+  .architecture__item::after {
+    transition: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .architecture {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'media'
+      'intro'
+      'list';
+    column-gap: 0;
+    row-gap: var(--space-8);
+    padding-bottom: var(--section-padding);
+  }
+
+  .architecture__media {
+    width: 100%;
+    justify-self: stretch;
+    transform: none;
+  }
+
+  .architecture__intro,
+  .architecture__list {
+    will-change: auto;
+    padding-right: var(--content-gutter);
+  }
+
+  .architecture__list {
+    width: 100%;
+    z-index: auto;
+  }
+}

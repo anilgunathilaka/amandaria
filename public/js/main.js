@@ -10,6 +10,9 @@
  *   7. Philosophy card slider
  *   8. Our Story right-image parallax
  *   9. Destination parallax
+ *  10. Architecture split
+ *  11. Aranya scroll theme + image travel
+ *  12. Experience hour carousel + copy parallax
  *
  * No framework, no build step — this file is served as-is.
  */
@@ -49,7 +52,7 @@
 
       var headerH = header.offsetHeight || 72;
       var onLight = false;
-      var lights = document.querySelectorAll('.section--light');
+      var lights = document.querySelectorAll('.section--light, #architecture');
       for (var i = 0; i < lights.length; i += 1) {
         var lightRect = lights[i].getBoundingClientRect();
         if (lightRect.top < headerH && lightRect.bottom > 0) {
@@ -551,6 +554,179 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* 10. Architecture split: list hover + slow image / fast copy          */
+  /* ------------------------------------------------------------------ */
+
+  function initArchitecture() {
+    var section = document.getElementById('architecture');
+    if (!section) return;
+
+    var items = section.querySelectorAll('.architecture__item');
+    var image = section.querySelector('[data-architecture-image]');
+    var copy = section.querySelector('[data-architecture-copy]');
+    var scrim = section.querySelector('[data-architecture-scrim]');
+    var caption = section.querySelector('[data-architecture-caption]');
+    var tag = section.querySelector('[data-architecture-tag]');
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    var ticking = false;
+    var fadeTimer = 0;
+
+    function showMaterial(target) {
+      if (!target) return;
+
+      for (var i = 0; i < items.length; i += 1) {
+        var on = items[i] === target;
+        items[i].classList.toggle('is-active', on);
+        items[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+      }
+
+      var src = target.getAttribute('data-image');
+      var nextAlt = target.getAttribute('data-alt') || '';
+      var nextCaption = target.getAttribute('data-caption') || '';
+      var nextTag = target.getAttribute('data-tag') || '';
+      if (!image || !src || image.getAttribute('src') === src) return;
+
+      function applySource() {
+        image.setAttribute('src', src);
+        image.setAttribute('alt', nextAlt);
+        if (caption) caption.textContent = nextCaption;
+        if (tag) tag.textContent = nextTag;
+        image.classList.remove('is-fading');
+      }
+
+      if (reduceMotion) {
+        applySource();
+        return;
+      }
+
+      image.classList.add('is-fading');
+      window.clearTimeout(fadeTimer);
+      fadeTimer = window.setTimeout(applySource, 180);
+    }
+
+    for (var i = 0; i < items.length; i += 1) {
+      var preloadSrc = items[i].getAttribute('data-image');
+      if (preloadSrc) {
+        var preload = new Image();
+        preload.src = preloadSrc;
+      }
+      items[i].addEventListener('mouseenter', function () {
+        showMaterial(this);
+      });
+      items[i].addEventListener('focus', function () {
+        showMaterial(this);
+      });
+      items[i].addEventListener('click', function () {
+        showMaterial(this);
+      });
+    }
+
+    function apply() {
+      ticking = false;
+
+      if (reduceMotion || window.innerWidth <= 960) {
+        if (image) image.style.transform = '';
+        if (copy) copy.style.transform = '';
+        if (scrim) scrim.style.opacity = '';
+        return;
+      }
+
+      var rect = section.getBoundingClientRect();
+      var viewH = window.innerHeight;
+      var span = viewH + rect.height;
+      if (span <= 0) return;
+
+      var progress = (viewH - rect.top) / span;
+      if (progress < 0) progress = 0;
+      if (progress > 1) progress = 1;
+
+      var fromCenter = progress - 0.5;
+      var slowTravel = Math.min(rect.height * 0.1, 56);
+      var fastTravel = Math.min(viewH * 0.55, 420);
+
+      if (image) {
+        image.style.transform =
+          'translate3d(0,' + (fromCenter * slowTravel).toFixed(2) + 'px,0)';
+      }
+      if (copy) {
+        copy.style.transform =
+          'translate3d(0,' + (-fromCenter * fastTravel).toFixed(2) + 'px,0)';
+      }
+      if (scrim) {
+        scrim.style.opacity = (1 - Math.pow(progress, 1.45) * 0.55).toFixed(3);
+      }
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(apply);
+    }
+
+    apply();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 11. Aranya: mid-viewport charcoal + fast image travel (no zoom)      */
+  /* ------------------------------------------------------------------ */
+
+  function initAranya() {
+    var section = document.getElementById('aranya');
+    if (!section) return;
+
+    var media = section.querySelector('[data-aranya-image]');
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    var ticking = false;
+
+    function apply() {
+      ticking = false;
+
+      var dark = section.getBoundingClientRect().top <= window.innerHeight / 2;
+      section.classList.toggle('section--light', !dark);
+      section.classList.toggle('section--alt', dark);
+
+      if (!media) return;
+
+      if (reduceMotion || window.innerWidth <= 960) {
+        media.style.transform = '';
+        return;
+      }
+
+      var rect = section.getBoundingClientRect();
+      var viewH = window.innerHeight;
+      var span = viewH + rect.height;
+      if (span <= 0) return;
+
+      var progress = (viewH - rect.top) / span;
+      if (progress < 0) progress = 0;
+      if (progress > 1) progress = 1;
+
+      var fromCenter = progress - 0.5;
+      // 200% of the Our Story image travel — translate only, no scale.
+      var travel = Math.min(viewH * 1.44, 1120);
+
+      media.style.transform =
+        'translate3d(0,' + (fromCenter * travel).toFixed(2) + 'px,0)';
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(apply);
+    }
+
+    apply();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+  }
+
+  /* ------------------------------------------------------------------ */
   /* 7. Philosophy card slider                                             */
   /* ------------------------------------------------------------------ */
 
@@ -659,6 +835,168 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* 12. Experience hour carousel                                          */
+  /* ------------------------------------------------------------------ */
+
+  function initExperienceSlider() {
+    var root = document.querySelector('[data-experience-slider]');
+    var viewport = root && root.querySelector('[data-experience-viewport]');
+    var prev = root && root.querySelector('[data-experience-prev]');
+    var next = root && root.querySelector('[data-experience-next]');
+    if (!root || !viewport) return;
+
+    var track = viewport.querySelector('.experience__track');
+    var cards = viewport.querySelectorAll('.experience-card');
+    if (!track || !cards.length) return;
+
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    var timer = 0;
+    var interval = 4500;
+
+    function step() {
+      var card = cards[0];
+      var styles = window.getComputedStyle(track);
+      var gap = parseFloat(styles.columnGap || styles.gap) || 0;
+      return card.getBoundingClientRect().width + gap;
+    }
+
+    function maxScroll() {
+      return Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    }
+
+    function lastStart() {
+      var size = step();
+      if (size <= 0) return 0;
+      return Math.round(maxScroll() / size);
+    }
+
+    function currentIndex() {
+      var size = step();
+      if (size <= 0) return 0;
+      var index = Math.round(viewport.scrollLeft / size);
+      var last = lastStart();
+      if (index < 0) return 0;
+      if (index > last) return last;
+      return index;
+    }
+
+    function goTo(index) {
+      var last = lastStart();
+      if (index > last) index = 0;
+      if (index < 0) index = last;
+      var left = index * step();
+      var max = maxScroll();
+      if (left > max) left = max;
+      if (left < 0) left = 0;
+      viewport.scrollTo({
+        left: left,
+        behavior: reduceMotion ? 'auto' : 'smooth',
+      });
+    }
+
+    function go(direction) {
+      goTo(currentIndex() + direction);
+    }
+
+    function stop() {
+      window.clearInterval(timer);
+      timer = 0;
+    }
+
+    function play() {
+      stop();
+      if (reduceMotion || cards.length < 2) return;
+      timer = window.setInterval(function () {
+        go(1);
+      }, interval);
+    }
+
+    function sync() {
+      root.classList.toggle('is-static', maxScroll() <= 2);
+    }
+
+    if (prev) {
+      prev.addEventListener('click', function () {
+        go(-1);
+        play();
+      });
+    }
+    if (next) {
+      next.addEventListener('click', function () {
+        go(1);
+        play();
+      });
+    }
+
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', play);
+    root.addEventListener('focusin', stop);
+    root.addEventListener('focusout', function (event) {
+      if (!root.contains(event.relatedTarget)) play();
+    });
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) stop();
+      else play();
+    });
+
+    viewport.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('resize', sync);
+    sync();
+    play();
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 13. Experience copy: 200% scroll speed vs the photos                 */
+  /* ------------------------------------------------------------------ */
+
+  function initExperienceParallax() {
+    var section = document.getElementById('experience');
+    var copy = section && section.querySelector('[data-experience-copy]');
+    if (!section || !copy) return;
+
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    var ticking = false;
+
+    function apply() {
+      ticking = false;
+
+      if (reduceMotion || window.innerWidth <= 960) {
+        copy.style.transform = '';
+        return;
+      }
+
+      var rect = section.getBoundingClientRect();
+      var viewH = window.innerHeight;
+      var span = viewH + rect.height;
+      if (span <= 0) return;
+
+      var progress = (viewH - rect.top) / span;
+      if (progress < 0) progress = 0;
+      if (progress > 1) progress = 1;
+
+      var fromCenter = progress - 0.5;
+      var fastTravel = rect.height;
+
+      copy.style.transform =
+        'translate3d(0,' + (-fromCenter * fastTravel).toFixed(2) + 'px,0)';
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(apply);
+    }
+
+    apply();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Boot                                                                  */
   /* ------------------------------------------------------------------ */
 
@@ -683,6 +1021,10 @@
     safeInit('initHeroExpand', initHeroExpand);
     safeInit('initBrandParallax', initBrandParallax);
     safeInit('initDestinationParallax', initDestinationParallax);
+    safeInit('initArchitecture', initArchitecture);
+    safeInit('initAranya', initAranya);
+    safeInit('initExperienceSlider', initExperienceSlider);
+    safeInit('initExperienceParallax', initExperienceParallax);
     safeInit('initSanctuarySlider', initSanctuarySlider);
   }
 

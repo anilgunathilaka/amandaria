@@ -1,0 +1,276 @@
+/**
+ * .experience — screenshot split: copy + chevrons on the left,
+ * two full-height portraits on the right.
+ */
+
+.experience {
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.4fr) minmax(0, 0.6fr);
+  align-items: stretch;
+  padding-block: 0;
+  overflow: hidden;
+  --experience-gap: clamp(10px, 1.2vw, 16px);
+  --experience-visible: 2;
+  --experience-copy-pad-end: clamp(24px, 3vw, 56px);
+  --experience-copy-block: max(
+    calc(var(--text-h2) * 6.5),
+    calc(28ch + clamp(1.5rem, 4vw, 3.5rem))
+  );
+  --experience-section-pad: 260px;
+  --experience-inner-height: calc(
+    100vh - (var(--header-height) + var(--space-6)) - 130px
+  );
+  --experience-card-height: 96%;
+  --experience-time-row: calc(var(--space-5) + var(--text-sub) * 1.4);
+  min-height: calc(
+    var(--experience-inner-height) + var(--experience-section-pad) * 2
+  );
+}
+
+.experience__copy {
+  display: flex;
+  flex-direction: column;
+  padding: var(--experience-section-pad)
+    var(--experience-copy-pad-end)
+    var(--experience-section-pad)
+    calc(
+      var(--content-gutter) +
+        max(
+          0px,
+          (
+              100% - var(--content-gutter) - var(--experience-copy-pad-end) -
+                var(--experience-copy-block)
+            ) * 0.4
+        )
+    );
+}
+
+.experience__copy .heading-2 {
+  margin-top: var(--space-5);
+  max-width: 12ch;
+}
+
+.experience__body {
+  margin-left: clamp(1.5rem, 4vw, 3.5rem);
+  margin-top: var(--space-6);
+  max-width: 28ch;
+}
+
+.experience__body .heading-sub {
+  font-style: italic;
+}
+
+.experience__hint {
+  margin: var(--space-5) 0 0;
+}
+
+.experience__controls {
+  display: flex;
+  gap: var(--space-3);
+  flex: none;
+  margin-top: var(--space-5);
+}
+
+.experience__btn {
+  width: 44px;
+  height: 44px;
+  border: 1px solid currentColor;
+  color: inherit;
+  position: relative;
+  transition:
+    border-color var(--duration-base) var(--ease-editorial),
+    background-color var(--duration-base) var(--ease-editorial),
+    color var(--duration-base) var(--ease-editorial),
+    opacity var(--duration-base) var(--ease-editorial);
+}
+
+.experience__btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-left: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+}
+
+.experience__btn[data-experience-prev]::before {
+  transform: translate(-30%, -50%) rotate(45deg);
+}
+
+.experience__btn[data-experience-next]::before {
+  transform: translate(-70%, -50%) rotate(-135deg);
+}
+
+.experience__btn:hover:not(:disabled) {
+  background: var(--color-text);
+  color: var(--color-surface-light);
+  border-color: var(--color-text);
+}
+
+.experience__btn:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.experience.is-static .experience__controls {
+  display: none;
+}
+
+.experience__slider {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  padding: var(--experience-section-pad) 0;
+}
+
+.experience__viewport {
+  grid-row: 1;
+  grid-column: 1;
+  align-self: end;
+  min-height: 0;
+  width: 100%;
+  height: var(--experience-card-height);
+  padding-bottom: var(--experience-time-row);
+  box-sizing: content-box;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  container-type: inline-size;
+}
+
+.experience__viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.experience__track {
+  display: flex;
+  align-items: stretch;
+  gap: var(--experience-gap);
+  width: max-content;
+  height: 100%;
+}
+
+.experience-card {
+  position: relative;
+  flex: 0 0
+    calc(
+      (100cqi - (var(--experience-visible) - 1) * var(--experience-gap)) /
+        var(--experience-visible)
+    );
+  height: 100%;
+  overflow: visible;
+  scroll-snap-align: start;
+}
+
+.experience-card__media {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  background: var(--color-surface-deep);
+}
+
+.experience-card__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgb(10 28 40 / 58%) 0%,
+    rgb(10 28 40 / 18%) 42%,
+    rgb(10 28 40 / 8%) 100%
+  );
+  pointer-events: none;
+}
+
+.experience-card__caption {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: var(--space-6);
+  pointer-events: none;
+  text-align: left;
+  color: var(--color-surface-light);
+}
+
+.experience-card__time {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  margin-top: var(--space-5);
+  padding: 0.2em 0.35em 0.3em;
+  font-family: var(--font-serif);
+  font-size: var(--text-sub);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  text-align: center;
+  color: var(--color-on-light);
+}
+
+.experience-card__title {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: clamp(1.35rem, 2.1vw, 2rem);
+  font-weight: 400;
+  line-height: var(--leading-snug);
+  color: inherit;
+  text-wrap: pretty;
+}
+
+.experience-card__body {
+  margin-top: var(--space-3);
+  max-width: 32ch;
+  font-size: var(--text-body);
+  line-height: var(--leading-snug);
+  color: color-mix(in srgb, var(--color-surface-light) 80%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .experience__viewport {
+    scroll-behavior: auto;
+  }
+}
+
+@media (max-width: 960px) {
+  .experience {
+    grid-template-columns: 1fr;
+    min-height: 0;
+    --experience-visible: 1;
+  }
+
+  .experience__copy {
+    min-height: auto;
+    padding-block: var(--section-padding-tight);
+    padding-right: var(--content-gutter);
+    padding-left: var(--content-gutter);
+  }
+
+  .experience__copy .heading-2 {
+    max-width: none;
+  }
+
+  .experience__slider {
+    height: min(72vh, 640px);
+    padding-top: 0;
+    padding-bottom: var(--section-padding-tight);
+  }
+
+  .experience__track {
+    padding-left: var(--content-gutter);
+  }
+}

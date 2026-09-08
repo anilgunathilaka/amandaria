@@ -29,12 +29,6 @@
   margin-top: clamp(28px, 4vw, 40px);
 }
 
-/* Experience section: the small "scroll to follow the day" hint under
-   the centered intro. */
-.experience__hint {
-  margin-top: 18px;
-}
-
 /* The Day timeline is narrower than the full content width and
    centered under the section intro. */
 .section-intro--center + .timeline {
@@ -51,6 +45,14 @@
 
 #sanctuary {
   z-index: 5;
+}
+
+#aranya {
+  z-index: 6;
+  overflow: hidden;
+  transition:
+    background-color var(--duration-slow) var(--ease-editorial),
+    color var(--duration-slow) var(--ease-editorial);
 }
 
 /* Anchor targets should land clear of the fixed header. */

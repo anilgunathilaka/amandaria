@@ -22,39 +22,22 @@
   height: 38px;
   flex: none;
   border-radius: 50%;
-  border: 1px solid var(--color-line-strong);
 }
 
 .material-row__swatch--glass {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--color-text-muted) 35%, transparent),
-    color-mix(in srgb, var(--color-text-muted) 6%, transparent)
-  );
+  background: color-mix(in srgb, var(--color-text-muted) 42%, transparent);
 }
 
 .material-row__swatch--timber {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--color-accent-strong) 78%, var(--color-surface-alt)),
-    color-mix(in srgb, var(--color-accent) 55%, var(--color-surface-deep))
-  );
+  background: color-mix(in srgb, var(--color-accent-strong) 72%, var(--color-surface-alt));
 }
 
 .material-row__swatch--stone {
-  background: linear-gradient(
-    135deg,
-    var(--color-text-soft),
-    color-mix(in srgb, var(--color-text-soft) 40%, var(--color-surface-alt))
-  );
+  background: var(--color-text-soft);
 }
 
 .material-row__swatch--concrete {
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--color-text-soft) 55%, var(--color-surface-alt)),
-    var(--color-surface-alt)
-  );
+  background: color-mix(in srgb, var(--color-text-soft) 45%, var(--color-surface-alt));
 }
 
 .material-row__label {

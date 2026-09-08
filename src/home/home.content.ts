@@ -40,6 +40,9 @@ export interface DestinationTag {
 export interface MaterialSwatch {
   key: 'glass' | 'timber' | 'stone' | 'concrete';
   label: string;
+  caption: string;
+  tag: string;
+  image: ContentImage;
 }
 
 export interface TimelineItem {
@@ -188,16 +191,52 @@ export const homeContent = {
     statement: 'Architecture does not tame the landscape; it frames it.',
     body: 'Built on principles of Tropical Modernism and minimalist jungle aesthetics, our structures — ranging from elevated river pavilion sanctuaries to sculptural, stump-inspired private villas — dissolve the barrier between inside and out.',
     materials: [
-      { key: 'glass', label: 'Glass' },
-      { key: 'timber', label: 'Timber' },
-      { key: 'stone', label: 'Stone' },
-      { key: 'concrete', label: 'Concrete' },
+      {
+        key: 'glass',
+        label: 'Glass',
+        caption: 'The Framed View',
+        tag: 'Study 01',
+        image: {
+          src: '/images/Pods/Pods_Bedroom_2.webp',
+          alt: 'A canopy bedroom framed in glass, looking out through the forest.',
+        },
+      },
+      {
+        key: 'timber',
+        label: 'Timber',
+        caption: 'Sculptural Villa',
+        tag: 'Study 04',
+        image: {
+          src: '/images/Villa/Villa_exterior.webp',
+          alt: 'The cylindrical timber villa on its hillside, reached by a lantern-lit bridge.',
+        },
+      },
+      {
+        key: 'stone',
+        label: 'Stone',
+        caption: 'Stone Sanctum',
+        tag: 'Study 03',
+        image: {
+          src: '/images/Pool-Spa/interior.webp',
+          alt: 'The spa’s circular rain shower falling into a still, shadowed stone chamber.',
+        },
+      },
+      {
+        key: 'concrete',
+        label: 'Concrete',
+        caption: 'Sunken Lounge',
+        tag: 'Study 02',
+        image: {
+          src: '/images/Villa/Villa_sunken_lounge.webp',
+          alt: 'A concrete sunken lounge with a wave ceiling, opening onto a mountain balcony.',
+        },
+      },
     ] as MaterialSwatch[],
-    panelCaption: 'Sculptural Villa',
-    panelTag: 'Study 04',
+    panelCaption: 'The Framed View',
+    panelTag: 'Study 01',
     image: {
-      src: '/images/Villa/Villa_exterior.webp',
-      alt: 'The cylindrical timber villa on its hillside, reached by a lantern-lit bridge.',
+      src: '/images/Pods/Pods_Bedroom_2.webp',
+      alt: 'A canopy bedroom framed in glass, looking out through the forest.',
     } as ContentImage,
   },
 
@@ -219,7 +258,7 @@ export const homeContent = {
     eyebrow: 'The Experience',
     heading: 'A Day Without a Schedule',
     subheading: 'Let the rhythm of the wild decide the pace.',
-    hint: 'Scroll to follow the day',
+    hint: 'Slide to follow the day',
     items: [
       {
         time: '06:00',
@@ -244,7 +283,7 @@ export const homeContent = {
         title: 'Into the Wild',
         body: 'Discover the surrounding landscape at the unhurried pace of your own choosing.',
         image: {
-          src: '/images/Pods/Pods_Exterior_1.webp',
+          src: '/images/Pods/Pods_Exterior_1_dark.webp',
           alt: 'A forest pavilion stepping out into the surrounding jungle.',
         },
       },
@@ -262,7 +301,7 @@ export const homeContent = {
         title: 'Under the Stars',
         body: 'Contemporary Sri Lankan dining beneath a vast, unpolluted night sky.',
         image: {
-          src: '/images/Restaurant/Restaurant_Exterior _2.webp',
+          src: '/images/Restaurant/Restaurant_Exterior _2-dark.webp',
           alt: 'The dining pavilion at dusk, lit for an evening under the open sky.',
         },
       },

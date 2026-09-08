@@ -1,37 +1,54 @@
-<section class="section section--deep" id="architecture" aria-labelledby="architecture-heading">
-  <div class="wrap split split--40-60">
-    <div class="order-2-mobile">
-      <span class="eyebrow">{{architecture.eyebrow}}</span>
-      <h2 id="architecture-heading" class="section-intro__heading heading-2">{{architecture.heading}}</h2>
-      <div class="home-copy">
-        <p class="statement">{{architecture.statement}}</p>
-        <p class="body-text">{{architecture.body}}</p>
-      </div>
-      <div class="material-row">
-        {{#each architecture.materials}}
-          <div class="material-row__item">
-            <span class="material-row__swatch material-row__swatch--{{this.key}}"></span>
-            <span class="material-row__label">{{this.label}}</span>
-          </div>
-        {{/each}}
-      </div>
+<section class="section architecture" id="architecture" aria-labelledby="architecture-heading">
+  <div class="architecture__intro" data-architecture-copy>
+    <span class="eyebrow">{{architecture.eyebrow}}</span>
+    <h2 id="architecture-heading" class="heading-2">{{architecture.heading}}</h2>
+    <div class="architecture__body">
+      <p class="statement">{{architecture.statement}}</p>
+      <p class="body-text">{{architecture.body}}</p>
     </div>
+  </div>
 
-    <div class="art-panel art-panel--wide reveal">
-      <div class="topo-field topo-field--photo">
-        <img
-          class="media-fill"
-          src="{{architecture.image.src}}"
-          alt="{{architecture.image.alt}}"
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-      <div class="art-panel__frame"></div>
-      <div class="art-panel__caption">
-        <span class="art-panel__caption-text">{{architecture.panelCaption}}</span>
-        <span class="art-panel__caption-tag">{{architecture.panelTag}}</span>
-      </div>
+  <ul class="architecture__list">
+    {{#each architecture.materials}}
+      <li>
+        <button
+          class="architecture__item{{#if @first}} is-active{{/if}}"
+          type="button"
+          aria-pressed="{{#if @first}}true{{else}}false{{/if}}"
+          data-image="{{this.image.src}}"
+          data-alt="{{this.image.alt}}"
+          data-caption="{{this.caption}}"
+          data-tag="{{this.tag}}"
+        >
+          <span
+            class="architecture__swatch material-row__swatch material-row__swatch--{{this.key}}"
+            aria-hidden="true"
+          ></span>
+          {{this.label}}
+        </button>
+      </li>
+    {{/each}}
+  </ul>
+
+  <div
+    class="architecture__media art-panel art-panel--wide"
+    data-architecture-media
+  >
+    <div class="topo-field topo-field--photo">
+      <img
+        class="media-fill"
+        src="{{architecture.image.src}}"
+        alt="{{architecture.image.alt}}"
+        loading="lazy"
+        decoding="async"
+        data-architecture-image
+      />
+    </div>
+    <div class="architecture__scrim" data-architecture-scrim aria-hidden="true"></div>
+    <div class="art-panel__frame"></div>
+    <div class="art-panel__caption">
+      <span class="art-panel__caption-text" data-architecture-caption>{{architecture.panelCaption}}</span>
+      <span class="art-panel__caption-tag" data-architecture-tag>{{architecture.panelTag}}</span>
     </div>
   </div>
 </section>
