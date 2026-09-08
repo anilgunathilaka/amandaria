@@ -18,7 +18,10 @@
 }
 
 .destination .media-fill {
+  height: 140%;
+  top: -20%;
   object-position: center 45%;
+  will-change: transform;
 }
 
 .destination__scrim {
@@ -31,6 +34,7 @@
     rgb(10 28 40 / 40%) 50%,
     rgb(10 28 40 / 20%) 100%
   );
+  will-change: opacity;
 }
 
 .destination__content {
@@ -38,6 +42,7 @@
   z-index: 2;
   width: 100%;
   padding: var(--section-padding) var(--content-gutter) clamp(56px, 8vw, 96px);
+  will-change: transform;
 }
 
 .destination__intro {
@@ -66,6 +71,16 @@
 
 .destination__tag-body {
   max-width: 44ch;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .destination .media-fill,
+  .destination__content,
+  .destination__scrim {
+    will-change: auto;
+    transform: none;
+    opacity: 1;
+  }
 }
 
 @media (max-width: 720px) {

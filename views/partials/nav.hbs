@@ -1,33 +1,40 @@
 <header class="site-header" id="siteHeader">
-  <a class="logo" href="#top">
-    <img
-      class="logo__image"
-      src="{{nav.logoSrc}}"
-      alt="{{nav.logoName}} — {{nav.logoSubtitle}}"
-      width="180"
-      height="90"
-    />
-  </a>
+  <div class="site-header__start">
+    <nav class="primary-nav" aria-label="Primary">
+      {{#each nav.links}}
+        <a class="primary-nav__link" href="{{this.href}}">{{this.label}}</a>
+      {{/each}}
+    </nav>
 
-  <nav class="primary-nav" aria-label="Primary">
-    {{#each nav.links}}
-      <a class="primary-nav__link" href="{{this.href}}">{{this.label}}</a>
-    {{/each}}
-  </nav>
-
-  <div class="site-header__actions">
-    <a class="btn btn--primary btn--small" href="{{nav.cta.href}}">{{nav.cta.label}}</a>
     <button
       class="menu-toggle"
       id="menuToggle"
       type="button"
       aria-expanded="false"
       aria-controls="mobileMenu"
-      aria-label="Open menu"
+      aria-label="{{nav.menuLabel}}"
+      data-open-label="{{nav.menuLabel}}"
+      data-close-label="{{nav.closeLabel}}"
     >
-      <span class="menu-toggle__bar" aria-hidden="true"></span>
-      <span class="menu-toggle__bar" aria-hidden="true"></span>
-      <span class="menu-toggle__bar" aria-hidden="true"></span>
+      <span class="menu-toggle__icon" aria-hidden="true">
+        <span class="menu-toggle__line"></span>
+        <span class="menu-toggle__line"></span>
+      </span>
+      <span class="menu-toggle__label">{{nav.menuLabel}}</span>
     </button>
+  </div>
+
+  <a class="site-header__logo" href="#top" data-header-logo>
+    <img
+      class="site-header__logo-icon"
+      src="{{nav.logoIconSrc}}"
+      alt="{{nav.logoName}}"
+      width="40"
+      height="40"
+    />
+  </a>
+
+  <div class="site-header__actions">
+    <a class="btn btn--accent btn--small" href="{{nav.cta.href}}">{{nav.cta.label}}</a>
   </div>
 </header>

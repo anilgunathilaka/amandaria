@@ -29,10 +29,11 @@
 }
 
 .final-cta__heading {
+  font-family: var(--font-display);
   font-size: var(--text-display);
-  font-weight: 300;
+  font-weight: 400;
   line-height: var(--leading-tight);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-display);
 }
 
 .final-cta__body {
@@ -54,6 +55,7 @@
   border-top: 1px solid var(--color-line);
   font-family: var(--font-serif);
   font-style: italic;
+  font-weight: 500;
   font-size: var(--text-sub);
   color: var(--color-text-muted);
 }

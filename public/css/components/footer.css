@@ -34,6 +34,7 @@
 .site-footer__statement {
   font-family: var(--font-serif);
   font-style: italic;
+  font-weight: 500;
   font-size: var(--text-sub);
   color: var(--color-text-soft);
 }

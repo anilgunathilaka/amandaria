@@ -1,8 +1,7 @@
 /**
- * .site-header — the fixed primary navigation bar.
- * .logo — the wordmark + mark, reused in the header and footer.
- * .primary-nav — the desktop link list.
- * .menu-toggle — the hamburger / close button (mobile).
+ * .site-header — sticky bar: primary links (or Menu text once
+ * scrolled) on the left, inquire on the right. The hero logo
+ * docks into the visual centre on scroll.
  */
 
 .site-header {
@@ -11,42 +10,30 @@
   left: 0;
   right: 0;
   z-index: 200;
-  padding: clamp(18px, 2.4vw, 30px) var(--content-gutter);
+  height: var(--header-height);
+  padding-inline: var(--content-gutter);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  background: transparent;
+}
+
+.site-header__start {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  background: linear-gradient(to bottom, rgb(10 28 40 / 55%), rgb(10 28 40 / 0%));
-  transition:
-    background-color var(--duration-slow) var(--ease-editorial),
-    border-color var(--duration-slow) var(--ease-editorial),
-    padding var(--duration-base) var(--ease-editorial);
-  border-bottom: 1px solid transparent;
-}
-
-.site-header.is-scrolled {
-  background: rgb(10 28 40 / 86%);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--color-line);
-  padding-block: clamp(14px, 1.6vw, 18px);
-}
-
-.logo {
-  display: inline-flex;
-  align-items: center;
-  flex: none;
-}
-
-.logo__image {
-  height: clamp(36px, 4.2vw, 48px);
-  width: auto;
-  display: block;
+  min-height: 1.2em;
+  justify-self: start;
 }
 
 .primary-nav {
   display: flex;
   align-items: center;
-  gap: clamp(22px, 2.6vw, 44px);
+  gap: clamp(18px, 2vw, 32px);
+  min-width: 0;
+  transition:
+    opacity var(--duration-base) var(--ease-editorial),
+    transform var(--duration-base) var(--ease-editorial);
 }
 
 .primary-nav__link {
@@ -54,9 +41,9 @@
   font-weight: 500;
   letter-spacing: var(--tracking-nav);
   text-transform: uppercase;
-  color: var(--color-text-muted);
+  color: var(--color-text);
   position: relative;
-  padding-bottom: 4px;
+  padding-bottom: 3px;
   white-space: nowrap;
   transition: color var(--duration-base) var(--ease-editorial);
 }
@@ -73,61 +60,148 @@
 }
 
 .primary-nav__link:hover {
-  color: var(--color-text);
+  color: var(--color-accent-strong);
 }
 
 .primary-nav__link:hover::after {
   right: 0;
 }
 
+.site-header.is-scrolled .primary-nav {
+  opacity: 0;
+  transform: translateY(-10px);
+  pointer-events: none;
+}
+
+.site-header__logo {
+  justify-self: center;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(14px) scale(1.35);
+  transition:
+    opacity var(--duration-slow) var(--ease-editorial),
+    transform var(--duration-slow) var(--ease-editorial);
+}
+
+.site-header.is-scrolled .site-header__logo {
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+
+.site-header__logo-icon {
+  width: var(--header-logo-icon);
+  height: auto;
+  display: block;
+}
+
 .site-header__actions {
   display: flex;
   align-items: center;
-  gap: 28px;
+  justify-content: flex-end;
+  gap: 18px;
+  justify-self: end;
 }
 
 .menu-toggle {
-  display: none;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-}
-
-.menu-toggle__bar {
-  width: 100%;
-  height: 1px;
-  background: var(--color-text);
-  display: block;
-  transition:
-    transform var(--duration-base) var(--ease-editorial),
-    opacity var(--duration-base) var(--ease-editorial);
-}
-
-.menu-toggle[aria-expanded='true'] .menu-toggle__bar:nth-child(1) {
-  transform: translateY(7px) rotate(45deg);
-}
-
-.menu-toggle[aria-expanded='true'] .menu-toggle__bar:nth-child(2) {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  transform: translateY(calc(-50% + 8px));
   opacity: 0;
+  pointer-events: none;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-menu);
+  font-weight: 600;
+  letter-spacing: var(--tracking-nav);
+  text-transform: uppercase;
+  color: var(--color-text);
+  white-space: nowrap;
+  transition:
+    opacity var(--duration-base) var(--ease-editorial),
+    transform var(--duration-base) var(--ease-editorial),
+    color var(--duration-base) var(--ease-editorial);
 }
 
-.menu-toggle[aria-expanded='true'] .menu-toggle__bar:nth-child(3) {
-  transform: translateY(-7px) rotate(-45deg);
+.menu-toggle__icon {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 18px;
+  height: 8px;
 }
 
-@media (max-width: 1280px) {
+.menu-toggle__line {
+  display: block;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  transform-origin: center;
+  transition: transform var(--duration-base) var(--ease-editorial);
+}
+
+.menu-toggle[aria-expanded='true'] .menu-toggle__line:first-child {
+  transform: translateY(3.25px) rotate(45deg);
+}
+
+.menu-toggle[aria-expanded='true'] .menu-toggle__line:last-child {
+  transform: translateY(-3.25px) rotate(-45deg);
+}
+
+.menu-toggle:hover {
+  color: var(--color-accent-strong);
+}
+
+.site-header.is-scrolled .menu-toggle {
+  opacity: 1;
+  transform: translateY(-50%);
+  pointer-events: auto;
+}
+
+.site-header.is-on-light .menu-toggle,
+.site-header.is-on-light .primary-nav__link {
+  color: var(--color-on-light);
+}
+
+.site-header.is-on-light .menu-toggle:hover,
+.site-header.is-on-light .primary-nav__link:hover {
+  color: var(--color-accent-strong);
+}
+
+@media (max-width: 1365px) {
   .primary-nav {
     display: none;
   }
 
-  .site-header__actions .btn {
-    display: none;
+  .menu-toggle {
+    position: static;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .site-header__actions {
+    gap: 12px;
   }
 
-  .menu-toggle {
-    display: flex;
+  .site-header__actions .btn--small {
+    padding-inline: 14px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primary-nav,
+  .menu-toggle,
+  .menu-toggle__line,
+  .site-header__logo {
+    transition: none;
   }
 }

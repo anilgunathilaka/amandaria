@@ -42,7 +42,19 @@
   margin: clamp(48px, 7vw, 88px) auto 0;
 }
 
+/* Later sections sit above the pinned hero video. */
+#main > .section,
+.site-footer {
+  position: relative;
+  z-index: 4;
+}
+
+#sanctuary {
+  z-index: 5;
+}
+
 /* Anchor targets should land clear of the fixed header. */
+#brand,
 #sanctuary,
 #destination,
 #architecture,
@@ -53,5 +65,5 @@
 #final-cta,
 #inquiry,
 #footer {
-  scroll-margin-top: 84px;
+  scroll-margin-top: var(--header-height);
 }

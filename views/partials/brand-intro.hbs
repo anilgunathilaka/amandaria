@@ -1,27 +1,37 @@
-<section class="section" id="brand" aria-labelledby="brand-heading">
-  <div class="wrap split split--55-45">
-    <div class="order-2-mobile">
-      <span class="eyebrow">{{brandIntro.eyebrow}}</span>
-      <h2 id="brand-heading" class="section-intro__heading heading-2">
-        {{#each brandIntro.headingLines}}{{this}}{{#unless @last}}<br />{{/unless}}{{/each}}
-      </h2>
-      <div class="home-copy">
-        {{#each brandIntro.paragraphs}}
-          <p class="body-text body-text--lg">{{this}}</p>
-        {{/each}}
-      </div>
-    </div>
-    <div class="art-panel art-panel--tall reveal">
-      <div class="topo-field topo-field--photo">
+<section class="section section--light" id="brand" aria-labelledby="brand-heading">
+  <div class="wrap brand-intro">
+    <div class="brand-intro__primary">
+      <figure class="brand-intro__media brand-intro__media--wide reveal">
         <img
-          class="media-fill"
-          src="{{brandIntro.image.src}}"
-          alt="{{brandIntro.image.alt}}"
+          src="{{brandIntro.imageLandscape.src}}"
+          alt="{{brandIntro.imageLandscape.alt}}"
           loading="lazy"
           decoding="async"
         />
+      </figure>
+
+      <div class="brand-intro__copy" data-brand-copy>
+        <span class="eyebrow">{{brandIntro.eyebrow}}</span>
+        <h2 id="brand-heading" class="heading-2">
+          {{#each brandIntro.headingLines}}
+            {{this}}{{#unless @last}}<br />{{/unless}}
+          {{/each}}
+        </h2>
+        <div class="home-copy">
+          {{#each brandIntro.paragraphs}}
+            <p class="body-text body-text--lg">{{this}}</p>
+          {{/each}}
+        </div>
       </div>
-      <div class="art-panel__frame"></div>
     </div>
+
+    <figure class="brand-intro__media brand-intro__media--tall" data-brand-parallax>
+      <img
+        src="{{brandIntro.image.src}}"
+        alt="{{brandIntro.image.alt}}"
+        loading="lazy"
+        decoding="async"
+      />
+    </figure>
   </div>
 </section>

@@ -18,21 +18,28 @@
 
   --palette-gold: #d9c27c;
   --palette-gold-deep: #c2a661;
+  --palette-white: #ffffff;
 
   /* ---- Semantic surfaces ------------------------------------------ */
   --color-surface: var(--palette-navy);
   --color-surface-raised: var(--palette-navy-light);
   --color-surface-alt: var(--palette-charcoal);
   --color-surface-deep: var(--palette-ink);
+  --color-surface-light: var(--palette-white);
 
   /* ---- Semantic text ----------------------------------------------- */
   --color-text: var(--palette-ivory);
   --color-text-muted: var(--palette-mist);
   --color-text-soft: var(--palette-stone);
+  --color-on-light: var(--palette-navy);
+  --color-on-light-muted: color-mix(in srgb, var(--palette-navy) 72%, var(--palette-stone));
 
   /* ---- Semantic accent --------------------------------------------- */
   --color-accent: var(--palette-gold-deep);
   --color-accent-strong: var(--palette-gold);
+
+  /* ---- Overlays ---------------------------------------------------- */
+  --color-overlay: rgb(10 28 40 / 0.58);
 
   /* ---- Borders / dividers ------------------------------------------ */
   --color-line: rgb(211 217 219 / 14%);

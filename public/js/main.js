@@ -6,6 +6,10 @@
  *   3. Scroll-reveal
  *   4. Generative topographic canvas art
  *   5. Inquiry form
+ *   6. Hero boxed-to-full-bleed scroll
+ *   7. Philosophy card slider
+ *   8. Our Story right-image parallax
+ *   9. Destination parallax
  *
  * No framework, no build step — this file is served as-is.
  */
@@ -18,20 +22,70 @@
 
   function initHeaderScroll() {
     var header = document.getElementById('siteHeader');
+    var heroIcon = document.querySelector('[data-hero-logo-icon]');
+    var heroText = document.querySelector('[data-hero-logo-text]');
     if (!header) return;
 
-    var threshold = 24;
+    var threshold = 40;
+    var fadeStart = 8;
+    var fadeRange = 180;
+    var ticking = false;
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    function easeOut(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
 
     function update() {
-      if (window.scrollY > threshold) {
-        header.classList.add('is-scrolled');
-      } else {
-        header.classList.remove('is-scrolled');
+      ticking = false;
+      var y = window.scrollY || document.documentElement.scrollTop || 0;
+      var scrolled = y > threshold;
+      header.classList.toggle('is-scrolled', scrolled);
+      if (heroIcon) {
+        heroIcon.classList.toggle('is-docked', scrolled);
       }
+
+      var headerH = header.offsetHeight || 72;
+      var onLight = false;
+      var lights = document.querySelectorAll('.section--light');
+      for (var i = 0; i < lights.length; i += 1) {
+        var lightRect = lights[i].getBoundingClientRect();
+        if (lightRect.top < headerH && lightRect.bottom > 0) {
+          onLight = true;
+          break;
+        }
+      }
+      header.classList.toggle('is-on-light', onLight);
+
+      if (!heroText) return;
+
+      var t = (y - fadeStart) / fadeRange;
+      if (t < 0) t = 0;
+      if (t > 1) t = 1;
+      var e = reduceMotion ? (t > 0 ? 1 : 0) : easeOut(t);
+
+      heroText.style.opacity = (1 - e).toFixed(3);
+      heroText.style.transform =
+        'translate3d(0, ' +
+        (-22 * e).toFixed(1) +
+        'px, 0) scale(' +
+        (1 - 0.1 * e).toFixed(3) +
+        ')';
+      heroText.style.filter = e > 0.02 ? 'blur(' + (5 * e).toFixed(2) + 'px)' : 'none';
+      heroText.style.pointerEvents = e > 0.8 ? 'none' : '';
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(update);
     }
 
     update();
-    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
   }
 
   /* ------------------------------------------------------------------ */
@@ -44,12 +98,20 @@
     if (!toggle || !menu) return;
 
     var links = menu.querySelectorAll('a');
+    var label = toggle.querySelector('.menu-toggle__label');
+    var openLabel = toggle.getAttribute('data-open-label') || 'Menu';
+    var closeLabel = toggle.getAttribute('data-close-label') || 'Close';
+
+    function setLabel(text) {
+      toggle.setAttribute('aria-label', text);
+      if (label) label.textContent = text;
+    }
 
     function open() {
       menu.classList.add('is-open');
       menu.setAttribute('aria-hidden', 'false');
       toggle.setAttribute('aria-expanded', 'true');
-      toggle.setAttribute('aria-label', 'Close menu');
+      setLabel(closeLabel);
       document.body.style.overflow = 'hidden';
     }
 
@@ -57,7 +119,7 @@
       menu.classList.remove('is-open');
       menu.setAttribute('aria-hidden', 'true');
       toggle.setAttribute('aria-expanded', 'false');
-      toggle.setAttribute('aria-label', 'Open menu');
+      setLabel(openLabel);
       document.body.style.overflow = '';
     }
 
@@ -80,12 +142,14 @@
       }
     });
 
-    // Keep the menu usable if the viewport crosses back over the
-    // desktop breakpoint while it's open.
     window.addEventListener(
       'resize',
       function () {
-        if (window.innerWidth > 1280 && menu.classList.contains('is-open')) {
+        if (
+          window.innerWidth > 1365 &&
+          window.scrollY <= 20 &&
+          menu.classList.contains('is-open')
+        ) {
           close();
         }
       },
@@ -283,15 +347,343 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* 6. Hero boxed-to-full-bleed scroll                                    */
+  /*    Side insets ease to 0 as the video travels up. Full-bleed when    */
+  /*    the clip reaches the top of the page.                             */
+  /* ------------------------------------------------------------------ */
+
+  function initHeroExpand() {
+    var track = document.querySelector('[data-hero-track]');
+    var frame = document.querySelector('[data-hero-frame]');
+    var video = document.querySelector('[data-hero-video]');
+    if (!track || !frame) return;
+
+    if (video) {
+      video.muted = true;
+      video.playsInline = true;
+      if (video.play) {
+        var playAttempt = video.play();
+        if (playAttempt && playAttempt.catch) playAttempt.catch(function () {});
+      }
+    }
+
+    var ticking = false;
+
+    function setBox(position, top, bottom, viewH) {
+      frame.style.position = position;
+      frame.style.top = top;
+      frame.style.bottom = bottom;
+      frame.style.left = '0px';
+      frame.style.right = '0px';
+      frame.style.width = '100%';
+      // Use the JS-measured viewport height, not CSS 100vh — on mobile the
+      // two disagree (address-bar chrome), which desyncs this box from the
+      // rect-based math below and breaks the pin/release handoff.
+      frame.style.height = viewH + 'px';
+      frame.style.minHeight = viewH + 'px';
+    }
+
+    function apply() {
+      ticking = false;
+      var rect = track.getBoundingClientRect();
+      var viewH = window.innerHeight;
+      var approach = 1 - Math.min(1, Math.max(0, rect.top / Math.max(viewH * 0.4, 1)));
+
+      frame.style.setProperty('--hero-clip', (1 - approach).toFixed(4));
+
+      if (rect.top > 1) {
+        setBox('sticky', '0px', 'auto', viewH);
+        frame.style.zIndex = '';
+        if (video) video.style.transform = '';
+        return;
+      }
+
+      if (rect.bottom <= viewH) {
+        setBox('absolute', 'auto', '0px', viewH);
+        frame.style.zIndex = '';
+        if (video) video.style.transform = '';
+        return;
+      }
+
+      setBox('fixed', '0px', 'auto', viewH);
+      frame.style.zIndex = '1';
+      if (video) {
+        var hold = Math.max(rect.height - viewH, 1);
+        var shift = Math.min(1, Math.max(0, -rect.top / hold));
+        video.style.transform = 'translate3d(0,' + (-12 * shift).toFixed(2) + '%,0)';
+      }
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(apply);
+    }
+
+    apply();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', apply);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 8. Our Story parallax                                                 */
+  /*    Copy runs ahead of the page; the portrait lags. #brand clips      */
+  /*    both so The Philosophy is never covered.                           */
+  /* ------------------------------------------------------------------ */
+
+  function initBrandParallax() {
+    var section = document.getElementById('brand');
+    var media = section && section.querySelector('[data-brand-parallax]');
+    var copy = section && section.querySelector('[data-brand-copy]');
+    if (!section || (!media && !copy)) return;
+
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    var ticking = false;
+
+    function apply() {
+      ticking = false;
+
+      if (reduceMotion || window.innerWidth <= 960) {
+        if (media) media.style.transform = '';
+        if (copy) copy.style.transform = '';
+        return;
+      }
+
+      var rect = section.getBoundingClientRect();
+      var viewH = window.innerHeight;
+      var span = viewH + rect.height;
+      if (span <= 0) return;
+
+      var progress = (viewH - rect.top) / span;
+      if (progress < 0) progress = 0;
+      if (progress > 1) progress = 1;
+
+      var fromCenter = progress - 0.5;
+      var slowTravel = Math.min(viewH * 0.72, 560);
+      var fastTravel = Math.min(viewH * 0.72, 560);
+
+      if (media) {
+        media.style.transform =
+          'translate3d(0,' + (fromCenter * slowTravel).toFixed(2) + 'px,0)';
+      }
+      if (copy) {
+        copy.style.transform =
+          'translate3d(0,' + (-fromCenter * fastTravel).toFixed(2) + 'px,0)';
+      }
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(apply);
+    }
+
+    apply();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 9. Destination parallax                                               */
+  /*    Background lags; copy runs ahead. The section clips both.         */
+  /* ------------------------------------------------------------------ */
+
+  function initDestinationParallax() {
+    var section = document.getElementById('destination');
+    var bg = section && section.querySelector('[data-destination-bg] .media-fill');
+    var copy = section && section.querySelector('[data-destination-copy]');
+    var scrim = section && section.querySelector('[data-destination-scrim]');
+    if (!section || (!bg && !copy && !scrim)) return;
+
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    var ticking = false;
+
+    function apply() {
+      ticking = false;
+
+      if (reduceMotion) {
+        if (bg) bg.style.transform = '';
+        if (copy) copy.style.transform = '';
+        if (scrim) scrim.style.opacity = '';
+        return;
+      }
+
+      var rect = section.getBoundingClientRect();
+      var viewH = window.innerHeight;
+      var span = viewH + rect.height;
+      if (span <= 0) return;
+
+      var progress = (viewH - rect.top) / span;
+      if (progress < 0) progress = 0;
+      if (progress > 1) progress = 1;
+
+      var fromCenter = progress - 0.5;
+      var slowTravel = Math.min(rect.height * 0.16, 110);
+      var fastTravel = Math.min(viewH * 1.05, 780);
+
+      if (bg) {
+        bg.style.transform =
+          'translate3d(0,' + (fromCenter * slowTravel).toFixed(2) + 'px,0)';
+      }
+      if (copy) {
+        copy.style.transform =
+          'translate3d(0,' + (-fromCenter * fastTravel).toFixed(2) + 'px,0)';
+      }
+      if (scrim) {
+        var fade = 1 - Math.pow(progress, 1.45) * 0.7;
+        scrim.style.opacity = fade.toFixed(3);
+      }
+    }
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(apply);
+    }
+
+    apply();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 7. Philosophy card slider                                             */
+  /* ------------------------------------------------------------------ */
+
+  function initSanctuarySlider() {
+    var root = document.querySelector('[data-sanctuary-slider]');
+    var viewport = root && root.querySelector('[data-sanctuary-viewport]');
+    var prev = root && root.querySelector('[data-sanctuary-prev]');
+    var next = root && root.querySelector('[data-sanctuary-next]');
+    if (!root || !viewport) return;
+
+    var track = viewport.querySelector('.sanctuary-slider__track');
+    var cards = viewport.querySelectorAll('.sanctuary-card');
+    if (!track || !cards.length) return;
+
+    var lines = root.querySelectorAll('[data-sanctuary-to]');
+
+    function step() {
+      var card = cards[0];
+      var styles = window.getComputedStyle(track);
+      var gap = parseFloat(styles.columnGap || styles.gap) || 0;
+      return card.getBoundingClientRect().width + gap;
+    }
+
+    function maxScroll() {
+      return Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    }
+
+    function currentIndex() {
+      var size = step();
+      if (size <= 0) return 0;
+      var index = Math.round(viewport.scrollLeft / size);
+      if (index < 0) return 0;
+      if (index > cards.length - 1) return cards.length - 1;
+      return index;
+    }
+
+    function goTo(index) {
+      var left = index * step();
+      var max = maxScroll();
+      if (left > max) left = max;
+      if (left < 0) left = 0;
+      viewport.scrollTo({
+        left: left,
+        behavior: 'smooth',
+      });
+    }
+
+    function sync() {
+      var max = maxScroll();
+      var atStart = viewport.scrollLeft <= 2;
+      var atEnd = viewport.scrollLeft >= max - 2;
+      root.classList.toggle('is-static', max <= 2);
+      if (prev) prev.disabled = atStart;
+      if (next) next.disabled = atEnd;
+
+      var active = currentIndex();
+      for (var i = 0; i < lines.length; i += 1) {
+        var on = i === active;
+        lines[i].classList.toggle('is-active', on);
+        if (on) {
+          lines[i].setAttribute('aria-current', 'true');
+        } else {
+          lines[i].removeAttribute('aria-current');
+        }
+      }
+    }
+
+    function go(direction) {
+      goTo(currentIndex() + direction);
+    }
+
+    function syncTheme() {
+      var dark = root.getBoundingClientRect().top <= window.innerHeight / 2;
+      root.classList.toggle('section--light', !dark);
+      root.classList.toggle('section--alt', dark);
+    }
+
+    function onWindow() {
+      sync();
+      syncTheme();
+    }
+
+    if (prev) {
+      prev.addEventListener('click', function () {
+        go(-1);
+      });
+    }
+    if (next) {
+      next.addEventListener('click', function () {
+        go(1);
+      });
+    }
+
+    for (var i = 0; i < lines.length; i += 1) {
+      lines[i].addEventListener('click', function () {
+        var to = parseInt(this.getAttribute('data-sanctuary-to') || '0', 10);
+        goTo(to);
+      });
+    }
+
+    viewport.addEventListener('scroll', sync, { passive: true });
+    window.addEventListener('scroll', onWindow, { passive: true });
+    window.addEventListener('resize', onWindow);
+    sync();
+    syncTheme();
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Boot                                                                  */
   /* ------------------------------------------------------------------ */
 
+  function safeInit(name, fn) {
+    try {
+      fn();
+    } catch (err) {
+      // One section's failure (e.g. a missing element, a browser quirk)
+      // must not stop the rest from wiring up — each section is
+      // independent, so isolate them.
+      // eslint-disable-next-line no-console
+      console.error('[main.js] ' + name + ' failed to initialize:', err);
+    }
+  }
+
   function init() {
-    initHeaderScroll();
-    initMobileMenu();
-    initScrollReveal();
-    initTopoFields();
-    initInquiryForm();
+    safeInit('initHeaderScroll', initHeaderScroll);
+    safeInit('initMobileMenu', initMobileMenu);
+    safeInit('initScrollReveal', initScrollReveal);
+    safeInit('initTopoFields', initTopoFields);
+    safeInit('initInquiryForm', initInquiryForm);
+    safeInit('initHeroExpand', initHeroExpand);
+    safeInit('initBrandParallax', initBrandParallax);
+    safeInit('initDestinationParallax', initDestinationParallax);
+    safeInit('initSanctuarySlider', initSanctuarySlider);
   }
 
   if (document.readyState === 'loading') {

@@ -1,0 +1,215 @@
+/**
+ * .sanctuary-slider — Philosophy cards in a horizontal track.
+ * Two cards sit fully in view; the third peeks halfway at the
+ * right edge of the page. Works with one to four cards.
+ */
+
+.sanctuary {
+  transition:
+    background-color var(--duration-slow) var(--ease-editorial),
+    color var(--duration-slow) var(--ease-editorial);
+}
+
+.sanctuary-slider {
+  --sanctuary-gap: clamp(1.25rem, 2.2vw, 2.25rem);
+  --sanctuary-start: max(
+    var(--content-gutter),
+    calc((100vw - var(--content-max-width)) / 2 + var(--content-gutter))
+  );
+  --sanctuary-card-width: calc(
+    (100vw - var(--sanctuary-start) - (2 * var(--sanctuary-gap))) / 2.5
+  );
+  margin-top: clamp(48px, 7vw, 88px);
+}
+
+.sanctuary-slider__intro {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-8);
+}
+
+.sanctuary-slider__intro .section-intro {
+  margin-bottom: 0;
+}
+
+.sanctuary-slider__controls {
+  display: flex;
+  gap: var(--space-3);
+  flex: none;
+  margin-bottom: var(--space-2);
+}
+
+.sanctuary-slider__btn {
+  width: 44px;
+  height: 44px;
+  border: 1px solid currentColor;
+  color: inherit;
+  position: relative;
+  transition:
+    border-color var(--duration-base) var(--ease-editorial),
+    background-color var(--duration-base) var(--ease-editorial),
+    color var(--duration-base) var(--ease-editorial),
+    opacity var(--duration-base) var(--ease-editorial);
+}
+
+.sanctuary-slider__btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-left: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+}
+
+.sanctuary-slider__btn[data-sanctuary-prev]::before {
+  transform: translate(-30%, -50%) rotate(45deg);
+}
+
+.sanctuary-slider__btn[data-sanctuary-next]::before {
+  transform: translate(-70%, -50%) rotate(-135deg);
+}
+
+.sanctuary-slider__btn:hover:not(:disabled) {
+  background: currentColor;
+  color: var(--color-on-accent);
+}
+
+.sanctuary-slider__btn:disabled {
+  opacity: 0.28;
+  cursor: default;
+}
+
+.sanctuary.is-static .sanctuary-slider__controls,
+.sanctuary.is-static .sanctuary-slider__progress {
+  display: none;
+}
+
+.sanctuary-slider__progress {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  margin-top: clamp(2rem, 4vw, 3.5rem);
+  padding-left: var(--sanctuary-start);
+  padding-right: var(--content-gutter);
+}
+
+.sanctuary-slider__progress-line {
+  position: relative;
+  width: 5.5rem;
+  height: 2.5rem;
+  padding: 0;
+  flex: none;
+}
+
+.sanctuary-slider__progress-line::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: color-mix(in srgb, currentColor 28%, transparent);
+  transform: translateY(-50%);
+}
+
+.sanctuary-slider__progress-line.is-active::before,
+.sanctuary-slider__progress-line:hover::before {
+  height: 1px;
+  background: currentColor;
+}
+
+.sanctuary-slider__viewport {
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: var(--sanctuary-start);
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
+.sanctuary-slider__viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.sanctuary-slider__track {
+  display: flex;
+  gap: var(--sanctuary-gap);
+  width: max-content;
+  padding-left: var(--sanctuary-start);
+  padding-right: var(--content-gutter);
+}
+
+.sanctuary-card {
+  flex: 0 0 var(--sanctuary-card-width);
+  min-width: 0;
+  scroll-snap-align: start;
+}
+
+.sanctuary-card__media {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--color-surface-raised);
+}
+
+.sanctuary-card__media .media-fill {
+  transition: transform 1.8s var(--ease-editorial);
+  transform: scale(1.02);
+}
+
+.sanctuary-card:hover .sanctuary-card__media .media-fill {
+  transform: scale(1.06);
+}
+
+.sanctuary-card__label {
+  display: block;
+  margin-top: var(--space-5);
+  font-size: var(--text-label);
+  font-weight: 600;
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.sanctuary-card__title {
+  margin-top: var(--space-3);
+  font-family: var(--font-serif);
+  font-size: var(--text-h3);
+  font-weight: 500;
+  line-height: var(--leading-snug);
+  color: var(--color-text);
+}
+
+.sanctuary-card__body {
+  margin-top: var(--space-4);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sanctuary-card__media .media-fill,
+  .sanctuary-card:hover .sanctuary-card__media .media-fill {
+    transform: none;
+    transition: none;
+  }
+
+  .sanctuary-slider__viewport {
+    scroll-behavior: auto;
+  }
+}
+
+@media (max-width: 960px) {
+  .sanctuary-slider__intro {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sanctuary-slider {
+    --sanctuary-card-width: calc(
+      (100vw - var(--sanctuary-start) - var(--sanctuary-gap)) / 1.5
+    );
+  }
+}

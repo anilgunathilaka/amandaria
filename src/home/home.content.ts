@@ -20,6 +20,11 @@ export interface ContentImage {
   alt: string;
 }
 
+export interface ContentVideo {
+  src: string;
+  type: string;
+}
+
 export interface SanctuaryItem {
   index: string;
   title: string;
@@ -60,6 +65,8 @@ export const homeContent = {
     logoName: 'Amandaria',
     logoSubtitle: 'Vanya Nadi',
     logoSrc: '/images/logo/AmandariaLogo.webp',
+    logoIconSrc: '/images/logo/amandaria-logo-icon.webp',
+    logoTextSrc: '/images/logo/AmandariaLogo-text.webp',
     links: [
       { label: 'The Sanctuary', href: '#sanctuary' },
       { label: 'Architecture & Design', href: '#architecture' },
@@ -68,12 +75,14 @@ export const homeContent = {
       { label: 'Private Inquiry', href: '#inquiry' },
     ] as NavLink[],
     cta: { label: 'Inquire', href: '#inquiry' } as CtaLink,
+    menuLabel: 'Menu',
+    closeLabel: 'Close',
     mobileExtra: { label: 'Contact', href: '#footer' } as CtaLink,
   },
 
   hero: {
     eyebrow: 'The Knuckles · Sri Lanka',
-    titleLines: ['Silence, Space,', 'and the Soul', 'of the River.'],
+    titleLines: ['Silence, Space,', 'and the Soul of the River.'],
     subtitle:
       'An intimate boutique retreat, thoughtfully woven into the canopy. Experience minimalist luxury, breathtaking vistas, and a world entirely your own.',
     primaryCta: { label: 'Discover Amandaria', href: '#brand' } as CtaLink,
@@ -84,6 +93,10 @@ export const homeContent = {
       src: '/images/Restaurant/Restaurant_Exterior_3.webp',
       alt: 'The hillside pavilion at golden hour, looking out across misted Knuckles valleys.',
     } as ContentImage,
+    video: {
+      src: '/videos/Mist_rolls_around_bamboo_pavilion_202609080129.mp4',
+      type: 'video/mp4',
+    } as ContentVideo,
   },
 
   brandIntro: {
@@ -93,6 +106,10 @@ export const homeContent = {
       'Deep in the heart of Sri Lanka, where the misty, ancient peaks of the Knuckles Mountain Range meet the whispering canopy of the jungle, time slows down. Amandaria — Vanya Nadi was born from a desire to create something rare: a sanctuary that honours the untamed majesty of the landscape without ever compromising on refined, barefoot luxury.',
       'Amandaria evokes a vision of peaceful grace and secluded beauty, while Vanya Nadi — meaning "wild river" — anchors the retreat to the organic, flowing pulse of the surrounding wilderness. Here, architecture does not conquer nature; it converses with it.',
     ],
+    imageLandscape: {
+      src: '/images/Villa/Villa_bed.webp',
+      alt: 'A bedroom opening through floor-to-ceiling glass onto misted forested hills.',
+    } as ContentImage,
     image: {
       src: '/images/Reception/Reception_Exterior.webp',
       alt: 'The arrival pavilion, set into the forested hillside of the Knuckles Range.',
@@ -160,8 +177,8 @@ export const homeContent = {
       },
     ] as DestinationTag[],
     image: {
-      src: '/images/Restaurant/Restaurant_Exterior_1.webp',
-      alt: 'An open hillside pavilion above a mist-filled valley in the Knuckles Mountain Range.',
+      src: '/images/Owner-Residence/Exterior-2.webp',
+      alt: 'The hillside residence looking out across misted Knuckles valleys.',
     } as ContentImage,
   },
 

@@ -1,0 +1,87 @@
+/**
+ * .brand-intro — staggered two-column story block: landscape image
+ * and copy on the left, a dropped portrait on the right.
+ * The tall image eases on a slower parallax; #brand clips it so it
+ * never paints over The Philosophy.
+ */
+
+#brand {
+  overflow: hidden;
+}
+
+.brand-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  column-gap: clamp(32px, 5vw, 80px);
+  align-items: start;
+}
+
+.brand-intro__primary {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(28px, 4.2vw, 52px);
+  min-width: 0;
+}
+
+.brand-intro__media {
+  margin: 0;
+  overflow: hidden;
+  background: var(--color-surface-raised);
+}
+
+.brand-intro__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.brand-intro__media--wide {
+  aspect-ratio: 3 / 2;
+}
+
+.brand-intro__media--tall {
+  aspect-ratio: 2 / 3;
+  margin-top: clamp(4.5rem, 12vw, 11rem);
+  will-change: transform;
+}
+
+.brand-intro__copy {
+  max-width: 38rem;
+  will-change: transform;
+}
+
+.brand-intro__copy .heading-2 {
+  margin-top: var(--space-5);
+}
+
+.brand-intro__copy .home-copy {
+  margin-top: var(--space-6);
+  margin-left: clamp(1.75rem, 4vw, 3.25rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-intro__media--tall,
+  .brand-intro__copy {
+    will-change: auto;
+    transform: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .brand-intro {
+    grid-template-columns: 1fr;
+    row-gap: clamp(28px, 5vw, 40px);
+  }
+
+  .brand-intro__media--tall {
+    margin-top: 0;
+    aspect-ratio: 3 / 4;
+    will-change: auto;
+  }
+
+  .brand-intro__copy {
+    will-change: auto;
+  }
+}

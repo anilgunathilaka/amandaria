@@ -1,5 +1,5 @@
 <section class="destination" id="destination" aria-labelledby="destination-heading">
-  <div class="topo-field topo-field--photo" aria-hidden="true">
+  <div class="topo-field topo-field--photo" aria-hidden="true" data-destination-bg>
     <img
       class="media-fill"
       src="{{destination.image.src}}"
@@ -8,9 +8,9 @@
       decoding="async"
     />
   </div>
-  <div class="destination__scrim" aria-hidden="true"></div>
+  <div class="destination__scrim" aria-hidden="true" data-destination-scrim></div>
 
-  <div class="destination__content">
+  <div class="destination__content" data-destination-copy>
     <div class="destination__intro section-intro">
       <span class="eyebrow">{{destination.eyebrow}}</span>
       <h2 id="destination-heading" class="section-intro__heading heading-2">

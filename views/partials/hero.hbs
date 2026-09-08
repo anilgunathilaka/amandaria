@@ -1,36 +1,53 @@
-<section class="hero" id="top">
-  <div class="topo-field topo-field--photo" aria-hidden="true">
-    <img
-      class="media-fill hero__image"
-      src="{{hero.image.src}}"
-      alt=""
-      fetchpriority="high"
-      decoding="async"
-    />
+<section class="hero" id="top" data-hero-expand>
+  <div class="hero__stage">
+    <a class="hero__logo" href="#top">
+      <img
+        class="hero__logo-icon"
+        src="{{nav.logoIconSrc}}"
+        alt=""
+        width="80"
+        height="80"
+        data-hero-logo-icon
+      />
+      <img
+        class="hero__logo-text"
+        src="{{nav.logoTextSrc}}"
+        alt="{{nav.logoName}} — {{nav.logoSubtitle}}"
+        width="280"
+        height="96"
+        data-hero-logo-text
+      />
+    </a>
+
+    <h1 class="hero__title">
+      {{#each hero.titleLines}}
+        {{this}}{{#unless @last}}<br />{{/unless}}
+      {{/each}}
+    </h1>
   </div>
-  <div class="hero__scrim" aria-hidden="true"></div>
 
-  <div class="hero__content">
-    <span class="hero__eyebrow eyebrow">{{hero.eyebrow}}</span>
+  <div class="hero__expand" data-hero-track>
+    <div class="hero__frame" data-hero-frame>
+      <video
+        class="hero__media"
+        data-hero-video
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+        poster="{{hero.image.src}}"
+        aria-label="{{hero.image.alt}}"
+      >
+        <source src="{{hero.video.src}}" type="{{hero.video.type}}" />
+      </video>
 
-    <div class="hero__bottom">
-      <h1 class="hero__title">
-        {{#each hero.titleLines}}
-          {{this}}{{#unless @last}}<br />{{/unless}}
-        {{/each}}
-      </h1>
-      <p class="hero__subtitle">{{hero.subtitle}}</p>
-
-      <div class="hero__ctas">
-        <a class="btn btn--primary" href="{{hero.primaryCta.href}}">{{hero.primaryCta.label}}</a>
-        <a class="btn" href="{{hero.secondaryCta.href}}">{{hero.secondaryCta.label}}</a>
-      </div>
-
-      <div class="hero__foot">
-        <span class="scroll-indicator">
-          <span class="scroll-indicator__line" aria-hidden="true"></span>
-          Scroll
-        </span>
+      <div class="hero__caption">
+        <p class="hero__subtitle">{{hero.subtitle}}</p>
+        <div class="hero__ctas">
+          <a class="btn btn--primary" href="{{hero.primaryCta.href}}">{{hero.primaryCta.label}}</a>
+          <a class="btn" href="{{hero.secondaryCta.href}}">{{hero.secondaryCta.label}}</a>
+        </div>
         <span class="hero__coords">{{hero.coordsLine1}}<br />{{hero.coordsLine2}}</span>
       </div>
     </div>

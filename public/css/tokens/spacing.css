@@ -24,4 +24,15 @@
   /* Shared horizontal layout */
   --content-max-width: 1560px;
   --content-gutter: clamp(24px, 5vw, 88px);
+  --header-height: 72px;
+  --header-logo-icon: 54px;
+  --hero-logo-icon: clamp(3.2rem, 5vw, 4.4rem);
+  --hero-logo-text: clamp(10.5rem, 17vw, 15.5rem);
+
+  /* Hero expand: boxed inset → full-bleed (Meritage scroll) */
+  --hero-inset-side: clamp(2.5rem, 12vw, 10rem);
+  --hero-stage-top: clamp(96px, 12vw, 160px);
+  --hero-stage-gap: clamp(40px, 6vw, 72px);
+  --hero-expand-extra: 150vh;
+  --hero-parallax-travel: 14%;
 }
