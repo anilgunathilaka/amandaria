@@ -1,0 +1,31 @@
+<section
+  class="section journey-statement"
+  id="journey"
+  aria-labelledby="journey-heading"
+  style="background-image: url('{{journeyStatement.image.src}}');"
+>
+  <video
+    class="journey-statement__video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto"
+    poster="{{journeyStatement.image.src}}"
+    aria-label="{{journeyStatement.image.alt}}"
+  >
+    <source src="{{journeyStatement.video.src}}" type="{{journeyStatement.video.type}}" />
+  </video>
+
+  <div class="journey-statement__scrim" aria-hidden="true"></div>
+
+  <div class="journey-statement__content">
+    <h2 id="journey-heading" class="journey-statement__heading">
+      {{#each journeyStatement.headingLines}}
+        {{this.text}}{{#if this.emphasis}}<em>{{this.emphasis}}</em>{{/if}}{{#unless @last}}<br />{{/unless}}
+      {{/each}}
+    </h2>
+
+    <a class="btn btn--primary journey-statement__cta" href="{{journeyStatement.cta.href}}">{{journeyStatement.cta.label}}</a>
+  </div>
+</section>

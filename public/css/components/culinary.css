@@ -1,0 +1,71 @@
+/**
+ * .culinary — Culinary Journey layout: a single rectangular photograph
+ * bleeding to the true left edge of the page, paired with the copy
+ * column on the right. Deliberately skips .wrap and any centering —
+ * the image must reach the viewport edge on every screen width, not
+ * just the edge of a centered content column.
+ */
+
+#culinary {
+  overflow: hidden;
+  padding-block: 0;
+}
+
+.culinary {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  align-items: stretch;
+  column-gap: clamp(48px, 6vw, 96px);
+  padding-right: var(--content-gutter);
+}
+
+.culinary__media {
+  margin: 0;
+  overflow: hidden;
+  height: 100%;
+  min-height: 100%;
+  background: var(--color-surface-raised);
+}
+
+.culinary__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.culinary__copy {
+  max-width: 34rem;
+  padding-top: var(--section-padding);
+}
+
+/* Paragraph and list sit indented a step in from the heading, echoing
+   the same offset .brand-intro__copy already uses for its body copy. */
+.culinary__copy .heading-sub,
+.culinary__copy .home-copy,
+.culinary__copy .culinary-themes,
+.culinary__copy .culinary__cta {
+  margin-left: clamp(1.75rem, 4vw, 3.25rem);
+}
+
+@media (max-width: 960px) {
+  .culinary {
+    grid-template-columns: 1fr;
+    row-gap: clamp(28px, 6vw, 44px);
+    padding-right: 0;
+  }
+
+  /* Stacked single-column layout: each item is its own row, so the
+     image has no sibling to stretch against — give it an explicit
+     ratio instead of the desktop's 100% row height. */
+  .culinary__media {
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+
+  .culinary__copy {
+    padding-inline: var(--content-gutter);
+    max-width: none;
+  }
+}

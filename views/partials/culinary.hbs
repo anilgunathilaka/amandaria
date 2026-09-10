@@ -1,6 +1,15 @@
-<section class="section" id="culinary" aria-labelledby="culinary-heading">
-  <div class="wrap split split--55-45">
-    <div>
+<section class="section section--light" id="culinary" aria-labelledby="culinary-heading">
+  <div class="culinary">
+    <figure class="culinary__media reveal">
+      <img
+        src="{{culinary.image.src}}"
+        alt="{{culinary.image.alt}}"
+        loading="lazy"
+        decoding="async"
+      />
+    </figure>
+
+    <div class="culinary__copy">
       <span class="eyebrow">{{culinary.eyebrow}}</span>
       <h2 id="culinary-heading" class="section-intro__heading heading-2">{{culinary.heading}}</h2>
       <p class="heading-sub">{{culinary.subheading}}</p>
@@ -8,14 +17,13 @@
         <p class="body-text body-text--lg">{{culinary.body}}</p>
       </div>
 
-      <div class="culinary-themes">
+      <ul class="culinary-themes">
         {{#each culinary.themes}}
-          <div class="culinary-themes__item">
-            <span class="culinary-themes__index">{{pad2 @index}}</span>
+          <li class="culinary-themes__item">
             <span class="culinary-themes__label">{{this}}</span>
-          </div>
+          </li>
         {{/each}}
-      </div>
+      </ul>
 
       <a class="text-link culinary__cta" href="{{culinary.cta.href}}">
         {{culinary.cta.label}}
@@ -23,19 +31,6 @@
           <path d="M0 4.5H12M12 4.5L8 0.5M12 4.5L8 8.5" stroke="currentColor" />
         </svg>
       </a>
-    </div>
-
-    <div class="art-panel art-panel--tall reveal">
-      <div class="topo-field topo-field--photo">
-        <img
-          class="media-fill"
-          src="{{culinary.image.src}}"
-          alt="{{culinary.image.alt}}"
-          loading="lazy"
-          decoding="async"
-        />
-      </div>
-      <div class="art-panel__frame"></div>
     </div>
   </div>
 </section>

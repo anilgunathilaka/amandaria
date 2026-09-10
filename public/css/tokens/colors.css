@@ -44,6 +44,8 @@
   /* ---- Borders / dividers ------------------------------------------ */
   --color-line: rgb(211 217 219 / 14%);
   --color-line-strong: rgb(211 217 219 / 24%);
+  --color-line-on-light: rgb(10 28 40 / 12%);
+  --color-line-on-light-strong: rgb(10 28 40 / 22%);
 
   /* ---- Interactive on light surfaces (e.g. solid ivory buttons) --- */
   --color-on-accent: var(--palette-ink);

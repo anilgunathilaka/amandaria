@@ -2,15 +2,14 @@
   <div class="wrap">
     <div class="site-footer__top">
       <div class="site-footer__brand">
-        <img
-          class="site-footer__mark"
-          src="{{nav.logoSrc}}"
-          alt="{{nav.logoName}} — {{nav.logoSubtitle}}"
-          width="220"
-          height="auto"
-        />
         <p class="site-footer__tagline">{{footer.brandTagline}}</p>
+        <a class="btn btn--small site-footer__contact-btn" href="{{footer.contactCta.href}}">{{footer.contactCta.label}}</a>
         <p class="site-footer__statement">{{footer.closingStatement}}</p>
+
+        <div class="site-footer__legal">
+          <span class="site-footer__copyright">&copy; {{year}} {{nav.logoName}}. All rights reserved.</span>
+          <a class="site-footer__email" href="mailto:{{footer.email}}">{{footer.email}}</a>
+        </div>
       </div>
 
       {{#each footer.groups}}
@@ -21,13 +20,39 @@
               <a class="site-footer__link" href="{{this.href}}">{{this.label}}</a>
             {{/each}}
           </div>
+
+          {{#if this.social}}
+            <div class="site-footer__social">
+              {{#each this.social}}
+                {{#if (eq this.platform "facebook")}}
+                  <a class="site-footer__social-link" href="{{this.href}}" aria-label="Facebook">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M13.5 21v-7.5h2.5l.5-3h-3V8.5c0-.9.3-1.5 1.6-1.5h1.4V4.2c-.3-.1-1.3-.2-2.5-.2-2.5 0-4 1.5-4 4.3V10.5H7.5v3H10V21h3.5z"
+                        fill="currentColor"
+                      />
+                    </svg>
+                  </a>
+                {{/if}}
+                {{#if (eq this.platform "instagram")}}
+                  <a class="site-footer__social-link" href="{{this.href}}" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <rect x="3.5" y="3.5" width="17" height="17" rx="5" stroke="currentColor" />
+                      <circle cx="12" cy="12" r="4.2" stroke="currentColor" />
+                      <circle cx="17.2" cy="6.8" r="1" fill="currentColor" />
+                    </svg>
+                  </a>
+                {{/if}}
+              {{/each}}
+            </div>
+          {{/if}}
         </div>
       {{/each}}
     </div>
+  </div>
 
-    <div class="site-footer__bottom">
-      <span class="site-footer__copyright">&copy; {{year}} {{nav.logoName}}. All rights reserved.</span>
-      <a class="site-footer__email" href="mailto:{{footer.email}}">{{footer.email}}</a>
-    </div>
+  <div class="site-footer__lockup" data-footer-lockup aria-hidden="true">
+    <p class="site-footer__wordmark">{{nav.logoName}}</p>
+    <p class="site-footer__wordmark-sub">{{nav.logoSubtitle}}</p>
   </div>
 </footer>

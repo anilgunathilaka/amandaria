@@ -73,6 +73,9 @@ h3 {
 .section {
   position: relative;
   padding-block: var(--section-padding);
+  transition:
+    background-color var(--duration-slow) var(--ease-editorial),
+    color var(--duration-slow) var(--ease-editorial);
 }
 
 .section--tight {
@@ -92,6 +95,8 @@ h3 {
   color: var(--color-on-light);
   --color-text: var(--color-on-light);
   --color-text-muted: var(--color-on-light-muted);
+  --color-line: var(--color-line-on-light);
+  --color-line-strong: var(--color-line-on-light-strong);
 }
 
 .split {

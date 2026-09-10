@@ -43,6 +43,24 @@
   z-index: 4;
 }
 
+/* Closing "pinned reveal": #journey (position:fixed, see
+   components/journey-statement.css) is anchored to the bottom of the
+   viewport behind the page. #main and the footer ride above it with an
+   opaque ground so it only shows through at the very end; the footer's
+   bottom margin is the scroll runway. It stops --outro-gap short of the
+   top so the footer settles into that band as the banner fills the rest
+   (the runway matches the banner height: viewport minus --outro-gap). */
+#main {
+  position: relative;
+  z-index: 4;
+  background-color: var(--color-surface);
+}
+
+.site-footer {
+  margin-bottom: calc(100vh - var(--outro-gap));
+  margin-bottom: calc(100svh - var(--outro-gap));
+}
+
 #sanctuary {
   z-index: 5;
 }

@@ -1,0 +1,86 @@
+/**
+ * .journey-statement — full-bleed closing statement banner with a
+ * muted, looping background video (__video); the inline background-image
+ * is its poster/fallback where autoplay is blocked or the file fails.
+ * The __scrim gradient sits between video and centred content for
+ * legibility.
+ *
+ * The section is position:fixed to the bottom of the viewport, sitting
+ * behind #main and .site-footer (see pages/home.css). The footer carries
+ * a tall bottom margin as a scroll runway: as the page bottoms out, the
+ * opaque footer travels up and off, revealing this fixed banner beneath
+ * it — the same "pinned reveal" idea the hero uses at the top.
+ */
+
+.journey-statement {
+  position: fixed;
+  inset: auto 0 0 0;
+  height: calc(100vh - var(--outro-gap));
+  height: calc(100svh - var(--outro-gap));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  z-index: 0;
+  background-image: none; /* set inline per-page via style="" */
+  background-size: cover;
+  background-position: center;
+  background-color: var(--color-surface-deep);
+}
+
+.journey-statement__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.journey-statement__scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to bottom,
+    rgb(10 28 40 / 45%),
+    rgb(10 28 40 / 30%) 40%,
+    rgb(10 28 40 / 55%)
+  );
+}
+
+.journey-statement__content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 0 var(--content-gutter);
+}
+
+.journey-statement__heading {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--text-display);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-display);
+  color: var(--color-surface-light);
+}
+
+/* The emphasised word carries no separate treatment — it matches the
+   rest of the heading (display font, upright). */
+.journey-statement__heading em {
+  font: inherit;
+}
+
+/* The button itself is the shared .btn / .btn--primary component; this
+   element only carries the spacing that sits it below the heading. */
+.journey-statement__cta {
+  margin-top: clamp(28px, 4vw, 40px);
+}
+
+/* Respect a reduced-motion preference: hold the poster frame, drop the
+   looping video. */
+@media (prefers-reduced-motion: reduce) {
+  .journey-statement__video {
+    display: none;
+  }
+}

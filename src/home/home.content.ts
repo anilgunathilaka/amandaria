@@ -52,9 +52,20 @@ export interface TimelineItem {
   image: ContentImage;
 }
 
+export interface SocialLink {
+  platform: 'facebook' | 'instagram';
+  href: string;
+}
+
+export interface StatementLine {
+  text: string;
+  emphasis?: string;
+}
+
 export interface FooterLinkGroup {
   heading: string;
   links: NavLink[];
+  social?: SocialLink[];
 }
 
 export const homeContent = {
@@ -100,6 +111,11 @@ export const homeContent = {
       src: '/videos/Mist_rolls_around_bamboo_pavilion_202609080129.mp4',
       type: 'video/mp4',
     } as ContentVideo,
+    // Shown large over the video once it opens to full-bleed on scroll.
+    wordmark: {
+      src: '/images/logo/Amandaria-white-text.webp',
+      alt: 'Amandaria',
+    } as ContentImage,
   },
 
   brandIntro: {
@@ -139,8 +155,8 @@ export const homeContent = {
         title: 'The River',
         body: 'The wild Vanya Nadi flows through the experience — heard before it is seen, felt long after it is left.',
         image: {
-          src: '/images/Villa/Villa_upper_deck.webp',
-          alt: 'A curved plunge pool and timber deck overlooking the mountain valley.',
+          src: '/images/Villa/Villa_exterior-river-view.webp',
+          alt: 'A curved timber villa on a forested hillside at dawn, the wild river winding through the misted valley below.',
         },
       },
       {
@@ -316,8 +332,12 @@ export const homeContent = {
     cta: { label: 'Discover the Culinary Journey', href: '#inquiry' } as CtaLink,
     themes: ['Time-honoured Spices', 'Local Organic Produce', 'Modern Techniques', 'Fine Wines'],
     image: {
-      src: '/images/Restaurant/Restaurant_Exterior_4.webp',
-      alt: 'Open-air dining and a sunken fire-pit lounge on the hillside pavilion.',
+      src: '/images/Restaurant/CulinaryJourney_2.webp',
+      alt: 'A plated dish of seared scallops with local spices and a glass of white wine, set against a mountain sunset.',
+    } as ContentImage,
+    secondaryImage: {
+      src: '/images/Restaurant/Restaurant_Exterior_1.webp',
+      alt: 'The sweeping bamboo-roofed pavilion at dawn, overlooking misted mountain forest.',
     } as ContentImage,
   },
 
@@ -356,26 +376,39 @@ export const homeContent = {
       'Your inquiry has been received. A member of the Amandaria team will be in touch personally to help shape your stay.',
   },
 
+  journeyStatement: {
+    headingLines: [
+      { text: 'Where silence' },
+      { text: 'becomes ', emphasis: 'sanctuary.' },
+    ] as StatementLine[],
+    cta: { label: 'Begin a Private Inquiry', href: '#inquiry' } as CtaLink,
+    image: {
+      src: '/images/Owner-Residence/Exterior-1.webp',
+      alt: 'An aerial view of a river pavilion nestled among misted jungle canopy in the Knuckles Mountain Range.',
+    } as ContentImage,
+    video: {
+      src: '/videos/footer-video.mp4',
+      type: 'video/mp4',
+    } as ContentVideo,
+  },
+
   footer: {
+    ctaLines: ['Ready to disappear into the wild?', 'Begin your private inquiry.'],
+    cta: { label: 'Private Inquiry', href: '#inquiry' } as CtaLink,
+    contactCta: { label: 'Contact Amandaria', href: 'mailto:info@amandaria.com' } as CtaLink,
     brandTagline: 'The Knuckles Mountain Range, Sri Lanka.',
     closingStatement: 'Beyond the map. Within the canopy.',
     email: 'info@amandaria.com',
     groups: [
       {
-        heading: 'Navigation',
-        links: [
-          { label: 'The Sanctuary', href: '#sanctuary' },
-          { label: 'Architecture & Design', href: '#architecture' },
-          { label: 'The Experience', href: '#experience' },
-          { label: 'Culinary Journey', href: '#culinary' },
-          { label: 'Private Inquiries', href: '#inquiry' },
-        ],
-      },
-      {
         heading: 'Contact & Inquiries',
         links: [
           { label: 'info@amandaria.com', href: 'mailto:info@amandaria.com' },
           { label: 'Private Inquiry Form', href: '#inquiry' },
+        ],
+        social: [
+          { platform: 'facebook', href: '#' },
+          { platform: 'instagram', href: '#' },
         ],
       },
       {

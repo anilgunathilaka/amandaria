@@ -13,11 +13,51 @@
  *  10. Architecture split
  *  11. Aranya scroll theme + image travel
  *  12. Experience hour carousel + copy parallax
+ *  13. Culinary Journey scroll theme
+ *  14. Absolute Privacy hold-and-grow reveal
+ *  15. Footer wordmark -> logo lockup (closing reveal)
  *
  * No framework, no build step — this file is served as-is.
  */
 (function () {
   'use strict';
+
+  /* ------------------------------------------------------------------ */
+  /* Shared scroll dispatcher                                             */
+  /*   One passive scroll listener + one rAF for the whole page. Section  */
+  /*   effects register a callback with onPageScroll(fn); it runs once    */
+  /*   per frame while the page moves. (The hero runs its own tighter     */
+  /*   loop — see section 6.)                                             */
+  /* ------------------------------------------------------------------ */
+
+  var scrollCallbacks = [];
+  var scrollScheduled = false;
+
+  function runScrollCallbacks() {
+    scrollScheduled = false;
+    for (var i = 0; i < scrollCallbacks.length; i += 1) {
+      try {
+        scrollCallbacks[i]();
+      } catch (err) {
+        // One effect failing must not stop the others.
+        // eslint-disable-next-line no-console
+        console.error('[main.js] scroll callback failed:', err);
+      }
+    }
+  }
+
+  function scheduleScroll() {
+    if (scrollScheduled) return;
+    scrollScheduled = true;
+    window.requestAnimationFrame(runScrollCallbacks);
+  }
+
+  function onPageScroll(fn) {
+    scrollCallbacks.push(fn);
+  }
+
+  window.addEventListener('scroll', scheduleScroll, { passive: true });
+  window.addEventListener('resize', scheduleScroll, { passive: true });
 
   /* ------------------------------------------------------------------ */
   /* 1. Header scroll state                                              */
@@ -32,7 +72,6 @@
     var threshold = 40;
     var fadeStart = 8;
     var fadeRange = 180;
-    var ticking = false;
     var reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
@@ -41,26 +80,50 @@
       return 1 - Math.pow(1 - t, 3);
     }
 
+    // --- geometry, cached (measured once + on resize / font swap) ------
+    // The header sits over a "light" section whenever one of these spans
+    // the header line; store each span in document coordinates so the
+    // per-frame test is pure arithmetic on scrollY (no getBoundingClientRect).
+    var headerH = 72;
+    var lightSpans = [];
+
+    function measure() {
+      headerH = header.offsetHeight || 72;
+      lightSpans = [];
+      var lights = document.querySelectorAll('.section--light, #architecture');
+      var pageY = window.pageYOffset;
+      for (var i = 0; i < lights.length; i += 1) {
+        var r = lights[i].getBoundingClientRect();
+        lightSpans.push([r.top + pageY, r.bottom + pageY]);
+      }
+    }
+
+    // --- guarded state -------------------------------------------------
+    var lastScrolled = null;
+    var lastOnLight = null;
+    var lastE = -1;
+
     function update() {
-      ticking = false;
-      var y = window.scrollY || document.documentElement.scrollTop || 0;
+      var y = window.pageYOffset;
       var scrolled = y > threshold;
-      header.classList.toggle('is-scrolled', scrolled);
-      if (heroIcon) {
-        heroIcon.classList.toggle('is-docked', scrolled);
+      if (scrolled !== lastScrolled) {
+        lastScrolled = scrolled;
+        header.classList.toggle('is-scrolled', scrolled);
+        if (heroIcon) heroIcon.classList.toggle('is-docked', scrolled);
       }
 
-      var headerH = header.offsetHeight || 72;
+      var line = y + headerH;
       var onLight = false;
-      var lights = document.querySelectorAll('.section--light, #architecture');
-      for (var i = 0; i < lights.length; i += 1) {
-        var lightRect = lights[i].getBoundingClientRect();
-        if (lightRect.top < headerH && lightRect.bottom > 0) {
+      for (var i = 0; i < lightSpans.length; i += 1) {
+        if (lightSpans[i][0] < line && lightSpans[i][1] > y) {
           onLight = true;
           break;
         }
       }
-      header.classList.toggle('is-on-light', onLight);
+      if (onLight !== lastOnLight) {
+        lastOnLight = onLight;
+        header.classList.toggle('is-on-light', onLight);
+      }
 
       if (!heroText) return;
 
@@ -68,6 +131,8 @@
       if (t < 0) t = 0;
       if (t > 1) t = 1;
       var e = reduceMotion ? (t > 0 ? 1 : 0) : easeOut(t);
+      if (Math.abs(e - lastE) < 0.002) return;
+      lastE = e;
 
       heroText.style.opacity = (1 - e).toFixed(3);
       heroText.style.transform =
@@ -76,19 +141,19 @@
         'px, 0) scale(' +
         (1 - 0.1 * e).toFixed(3) +
         ')';
-      heroText.style.filter = e > 0.02 ? 'blur(' + (5 * e).toFixed(2) + 'px)' : 'none';
+      heroText.style.filter =
+        e > 0.02 ? 'blur(' + (5 * e).toFixed(2) + 'px)' : 'none';
       heroText.style.pointerEvents = e > 0.8 ? 'none' : '';
     }
 
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(update);
-    }
-
+    measure();
     update();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
+    onPageScroll(update);
+    window.addEventListener('resize', measure);
+    window.addEventListener('load', measure);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(measure);
+    }
   }
 
   /* ------------------------------------------------------------------ */
@@ -351,14 +416,20 @@
 
   /* ------------------------------------------------------------------ */
   /* 6. Hero boxed-to-full-bleed scroll                                    */
-  /*    Side insets ease to 0 as the video travels up. Full-bleed when    */
-  /*    the clip reaches the top of the page.                             */
+  /*    The frame is pinned by native CSS position:sticky (hero.css).     */
+  /*    This only scrubs two compositor-cheap things: the side curtains   */
+  /*    open (--hero-open) as the frame reaches the top, and the wordmark */
+  /*    fades in over the pinned phase. The video does not move — no      */
+  /*    parallax. Geometry is measured once (and on resize); the loop     */
+  /*    reads only window.pageYOffset and writes only a custom property   */
+  /*    and opacity/transform — no per-frame layout, no repaint.          */
   /* ------------------------------------------------------------------ */
 
   function initHeroExpand() {
     var track = document.querySelector('[data-hero-track]');
     var frame = document.querySelector('[data-hero-frame]');
     var video = document.querySelector('[data-hero-video]');
+    var wordmark = frame && frame.querySelector('[data-hero-wordmark]');
     if (!track || !frame) return;
 
     if (video) {
@@ -370,62 +441,118 @@
       }
     }
 
-    var ticking = false;
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
 
-    function setBox(position, top, bottom, viewH) {
-      frame.style.position = position;
-      frame.style.top = top;
-      frame.style.bottom = bottom;
-      frame.style.left = '0px';
-      frame.style.right = '0px';
-      frame.style.width = '100%';
-      // Use the JS-measured viewport height, not CSS 100vh — on mobile the
-      // two disagree (address-bar chrome), which desyncs this box from the
-      // rect-based math below and breaks the pin/release handoff.
-      frame.style.height = viewH + 'px';
-      frame.style.minHeight = viewH + 'px';
+    function clamp01(n) {
+      return n < 0 ? 0 : n > 1 ? 1 : n;
     }
 
-    function apply() {
-      ticking = false;
-      var rect = track.getBoundingClientRect();
-      var viewH = window.innerHeight;
-      var approach = 1 - Math.min(1, Math.max(0, rect.top / Math.max(viewH * 0.4, 1)));
+    // --- geometry, measured once and on resize (the only layout reads) --
+    var trackDocTop = 0;
+    var trackH = 0;
+    var frameH = 0;
+    var viewH = 0;
 
-      frame.style.setProperty('--hero-clip', (1 - approach).toFixed(4));
+    function measure() {
+      var r = track.getBoundingClientRect();
+      trackDocTop = r.top + window.pageYOffset;
+      trackH = track.offsetHeight;
+      frameH = frame.offsetHeight;
+      viewH = window.innerHeight || frameH;
+    }
 
-      if (rect.top > 1) {
-        setBox('sticky', '0px', 'auto', viewH);
-        frame.style.zIndex = '';
-        if (video) video.style.transform = '';
-        return;
+    // --- guarded compositor writes --------------------------------------
+    var lastOpen = -1;
+    var lastWm = -1;
+
+    function frameStep(y) {
+      // trackTop / trackBottom relative to the viewport — same values the
+      // old getBoundingClientRect() produced, without forcing layout.
+      var trackTop = trackDocTop - y;
+      var trackBottom = trackTop + trackH;
+
+      // Curtains open (boxed -> full-bleed) as the frame nears the top.
+      var open = 1 - clamp01(trackTop / (viewH * 0.4 || 1));
+      if (Math.abs(open - lastOpen) >= 0.002) {
+        lastOpen = open;
+        frame.style.setProperty('--hero-open', open.toFixed(4));
       }
 
-      if (rect.bottom <= viewH) {
-        setBox('absolute', 'auto', '0px', viewH);
-        frame.style.zIndex = '';
-        if (video) video.style.transform = '';
-        return;
+      // Pin progress 0 -> 1 across the pinned phase, then held at 1 once
+      // the frame releases (no reset -> nothing snaps). The video itself
+      // no longer moves — it's locked in the frame.
+      var pinT;
+      if (trackTop > 0) {
+        pinT = 0;
+      } else if (trackBottom > frameH) {
+        pinT = clamp01(-trackTop / Math.max(trackH - frameH, 1));
+      } else {
+        pinT = 1;
       }
 
-      setBox('fixed', '0px', 'auto', viewH);
-      frame.style.zIndex = '1';
-      if (video) {
-        var hold = Math.max(rect.height - viewH, 1);
-        var shift = Math.min(1, Math.max(0, -rect.top / hold));
-        video.style.transform = 'translate3d(0,' + (-12 * shift).toFixed(2) + '%,0)';
+      if (wordmark) {
+        var wIn = Math.min(1, pinT / 0.16);
+        var wOut = clamp01((pinT - 0.68) / 0.28);
+        var v = Math.max(0, wIn - wOut);
+        var e = v <= 0 ? 0 : v >= 1 ? 1 : v * v * (3 - 2 * v);
+        if (Math.abs(e - lastWm) >= 0.002) {
+          lastWm = e;
+          wordmark.style.opacity = e.toFixed(3);
+          wordmark.style.transform = reduceMotion
+            ? ''
+            : 'translate3d(0,' + (24 * (1 - e)).toFixed(1) + 'px,0)';
+        }
       }
     }
 
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(apply);
+    // --- frame-current rAF loop, alive only while the page is moving ----
+    // Reading scrollY at the top of the same frame it paints keeps the
+    // curtains and wordmark exactly on the scroll position (no rAF-after-
+    // scroll lag); it parks itself after a few still frames.
+    var raf = null;
+    var lastY = -1;
+    var idle = 0;
+
+    function tick() {
+      var y = window.pageYOffset;
+      if (y !== lastY) {
+        lastY = y;
+        idle = 0;
+      } else {
+        idle += 1;
+      }
+      frameStep(y);
+      raf = idle < 4 ? window.requestAnimationFrame(tick) : null;
     }
 
-    apply();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', apply);
+    function kick() {
+      if (raf == null) {
+        idle = 0;
+        raf = window.requestAnimationFrame(tick);
+      }
+    }
+
+    function remeasure() {
+      measure();
+      frameStep(window.pageYOffset);
+    }
+
+    measure();
+    frameStep(window.pageYOffset);
+    window.addEventListener('scroll', kick, { passive: true });
+    window.addEventListener('resize', remeasure);
+    // Late layout shifts (webfont swap, images) move where the track
+    // starts — re-measure when they settle.
+    window.addEventListener('load', remeasure);
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(remeasure);
+    }
+    if (window.ResizeObserver) {
+      var stage = document.querySelector('.hero__stage');
+      if (stage) new window.ResizeObserver(remeasure).observe(stage);
+    }
   }
 
   /* ------------------------------------------------------------------ */
@@ -443,11 +570,8 @@
     var reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
-    var ticking = false;
 
     function apply() {
-      ticking = false;
-
       if (reduceMotion || window.innerWidth <= 960) {
         if (media) media.style.transform = '';
         if (copy) copy.style.transform = '';
@@ -477,15 +601,8 @@
       }
     }
 
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(apply);
-    }
-
     apply();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
+    onPageScroll(apply);
   }
 
   /* ------------------------------------------------------------------ */
@@ -503,11 +620,8 @@
     var reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
-    var ticking = false;
 
     function apply() {
-      ticking = false;
-
       if (reduceMotion) {
         if (bg) bg.style.transform = '';
         if (copy) copy.style.transform = '';
@@ -542,15 +656,8 @@
       }
     }
 
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(apply);
-    }
-
     apply();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
+    onPageScroll(apply);
   }
 
   /* ------------------------------------------------------------------ */
@@ -570,7 +677,6 @@
     var reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
-    var ticking = false;
     var fadeTimer = 0;
 
     function showMaterial(target) {
@@ -624,8 +730,6 @@
     }
 
     function apply() {
-      ticking = false;
-
       if (reduceMotion || window.innerWidth <= 960) {
         if (image) image.style.transform = '';
         if (copy) copy.style.transform = '';
@@ -659,15 +763,8 @@
       }
     }
 
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(apply);
-    }
-
     apply();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
+    onPageScroll(apply);
   }
 
   /* ------------------------------------------------------------------ */
@@ -682,11 +779,8 @@
     var reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
-    var ticking = false;
 
     function apply() {
-      ticking = false;
-
       var dark = section.getBoundingClientRect().top <= window.innerHeight / 2;
       section.classList.toggle('section--light', !dark);
       section.classList.toggle('section--alt', dark);
@@ -715,19 +809,31 @@
         'translate3d(0,' + (fromCenter * travel).toFixed(2) + 'px,0)';
     }
 
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(apply);
-    }
-
     apply();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
+    onPageScroll(apply);
   }
 
   /* ------------------------------------------------------------------ */
-  /* 7. Philosophy card slider                                             */
+  /* 13. Culinary Journey: white until the section reaches mid-viewport,  */
+  /*     then back to the section's original background.                  */
+  /* ------------------------------------------------------------------ */
+
+  function initCulinaryTheme() {
+    var section = document.getElementById('culinary');
+    if (!section) return;
+
+
+    function apply() {
+      var passedHalf = section.getBoundingClientRect().top <= window.innerHeight / 2;
+      section.classList.toggle('section--light', !passedHalf);
+    }
+
+    apply();
+    onPageScroll(apply);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 7. Philosophy card slider (+ autoplay)                                */
   /* ------------------------------------------------------------------ */
 
   function initSanctuarySlider() {
@@ -809,29 +915,118 @@
       syncTheme();
     }
 
+    /* -- autoplay ---------------------------------------------------- */
+    /* Opt-in via data-sanctuary-autoplay (ms, or "off"); defaults to
+       6000. Advances one card every interval and loops. Suppressed while
+       the section is off-screen, while the pointer/focus is inside it,
+       for a spell after any manual navigation or swipe, and entirely
+       under prefers-reduced-motion. */
+    var apAttr = (root.getAttribute('data-sanctuary-autoplay') || '')
+      .trim()
+      .toLowerCase();
+    var apMs =
+      apAttr === 'off' || apAttr === '0' || apAttr === 'false'
+        ? 0
+        : parseInt(apAttr, 10) || 1000;
+    var apAllowed =
+      apMs > 0 &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+      cards.length > 1;
+    var apInView = false;
+    var apHold = false;
+    var apNudgedAt = 0;
+    var apTimer = null;
+    var apResumeAfter = Math.max(apMs * 2, 10000);
+
+    function apCanRun() {
+      return (
+        apAllowed &&
+        apInView &&
+        !apHold &&
+        Date.now() - apNudgedAt >= apResumeAfter &&
+        maxScroll() > 2
+      );
+    }
+
+    function apTick() {
+      if (apCanRun()) {
+        // Loop when the track can't scroll any further (the last "page"
+        // shows more than one card, so currentIndex() tops out before
+        // cards.length - 1 — key off scroll position, like sync()).
+        var atEnd = viewport.scrollLeft >= maxScroll() - 2;
+        goTo(atEnd ? 0 : currentIndex() + 1);
+      }
+      apTimer = window.setTimeout(apTick, apMs);
+    }
+
+    function apStart() {
+      if (apAllowed && !apTimer) apTimer = window.setTimeout(apTick, apMs);
+    }
+
+    function apStop() {
+      window.clearTimeout(apTimer);
+      apTimer = null;
+    }
+
+    function apNudge() {
+      apNudgedAt = Date.now();
+    }
+
     if (prev) {
       prev.addEventListener('click', function () {
+        apNudge();
         go(-1);
       });
     }
     if (next) {
       next.addEventListener('click', function () {
+        apNudge();
         go(1);
       });
     }
 
     for (var i = 0; i < lines.length; i += 1) {
       lines[i].addEventListener('click', function () {
+        apNudge();
         var to = parseInt(this.getAttribute('data-sanctuary-to') || '0', 10);
         goTo(to);
       });
     }
 
     viewport.addEventListener('scroll', sync, { passive: true });
-    window.addEventListener('scroll', onWindow, { passive: true });
-    window.addEventListener('resize', onWindow);
+    onPageScroll(onWindow);
     sync();
     syncTheme();
+
+    if (apAllowed) {
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(
+          function (entries) {
+            apInView = entries[0].isIntersecting;
+            if (apInView) apStart();
+            else apStop();
+          },
+          { threshold: 0.4 },
+        ).observe(root);
+      } else {
+        apInView = true;
+        apStart();
+      }
+      root.addEventListener('mouseenter', function () {
+        apHold = true;
+      });
+      root.addEventListener('mouseleave', function () {
+        apHold = false;
+      });
+      root.addEventListener('focusin', function () {
+        apHold = true;
+      });
+      root.addEventListener('focusout', function () {
+        apHold = false;
+      });
+      viewport.addEventListener('pointerdown', apNudge);
+      viewport.addEventListener('wheel', apNudge, { passive: true });
+    }
   }
 
   /* ------------------------------------------------------------------ */
@@ -959,11 +1154,8 @@
     var reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
-    var ticking = false;
 
     function apply() {
-      ticking = false;
-
       if (reduceMotion || window.innerWidth <= 960) {
         copy.style.transform = '';
         return;
@@ -985,15 +1177,144 @@
         'translate3d(0,' + (-fromCenter * fastTravel).toFixed(2) + 'px,0)';
     }
 
-    function onScroll() {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(apply);
+    apply();
+    onPageScroll(apply);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 14. Absolute Privacy: hold-and-grow reveal                           */
+  /*     .privacy-section__pin sticks for one viewport height (same hold  */
+  /*     technique the hero video uses) and flex-centers the frame        */
+  /*     inside it while .privacy-section__stage's extra height scrolls   */
+  /*     past underneath. Scrolling through that extra height drives      */
+  /*     scale 0.8→1 and opacity 0.8→1; once full size is reached the     */
+  /*     frame just holds there until the stage runs out and it          */
+  /*     releases to scroll away normally.                                */
+  /* ------------------------------------------------------------------ */
+
+  function initPrivacyReveal() {
+    var stage = document.querySelector('[data-privacy-stage]');
+    var frame = document.querySelector('[data-privacy-frame]');
+    if (!stage || !frame) return;
+
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    if (reduceMotion) return;
+
+
+    function apply() {
+      var rect = stage.getBoundingClientRect();
+      var viewH = window.innerHeight;
+
+      // .privacy-section__pin sits at the stage's own top with no
+      // offset, so rect.top here doubles as the pin's natural
+      // (unstuck) top. Progress runs across exactly that entrance —
+      // 0 the instant the section's top touches the bottom of the
+      // viewport, 1 once it's fully pinned (rect.top reaches 0 and
+      // the 100vh pin fills the screen). Whatever stage height remains
+      // beyond that is where the fully-grown frame holds before it
+      // releases.
+      var progress = (viewH - rect.top) / viewH;
+      if (progress < 0) progress = 0;
+      if (progress > 1) progress = 1;
+
+      var scale = (0.8 + 0.2 * progress).toFixed(3);
+      var opacity = (0.8 + 0.2 * progress).toFixed(3);
+
+      frame.style.transform = 'scale(' + scale + ')';
+      frame.style.opacity = opacity;
     }
 
     apply();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
+    onPageScroll(apply);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 15. Footer wordmark -> logo lockup (closing reveal)                   */
+  /*     #journey is pinned behind the page (position:fixed); the footer  */
+  /*     rides above it with a bottom-margin scroll runway that stops     */
+  /*     --outro-gap short of the top. Across that runway this scrubs     */
+  /*     --outro 0 -> 1 (footer.css crossfades the wordmark to gold,      */
+  /*     scales it down, grows in the icon + Vanya Nadi) and pins the     */
+  /*     lockup centred in that gap band, resolving into the brand logo   */
+  /*     over the revealed banner.                                         */
+  /* ------------------------------------------------------------------ */
+
+  function initFooterOutro() {
+    var footer = document.querySelector('.site-footer');
+    var lock = footer && footer.querySelector('[data-footer-lockup]');
+    if (!footer || !lock) return;
+
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    if (reduceMotion) return;
+
+    // Nudge the banner video into playback (autoplay can be blocked
+    // until a gesture; muted + inline is the reliable combination).
+    var video = document.querySelector('.journey-statement__video');
+    if (video && video.play) {
+      video.muted = true;
+      video.playsInline = true;
+      var attempt = video.play();
+      if (attempt && attempt.catch) attempt.catch(function () {});
+    }
+
+    var header = document.getElementById('siteHeader');
+    var gap =
+      parseInt(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          '--outro-gap',
+        ),
+        10,
+      ) || 200;
+    var ty = 0;
+
+    function apply() {
+      var viewH = window.innerHeight;
+      var rect = footer.getBoundingClientRect();
+
+      // Progress runs while the footer's bottom edge travels from the
+      // bottom of the viewport up to --outro-gap from the top, where it
+      // settles — the length of its own bottom-margin runway, which is
+      // viewport minus that gap (see pages/home.css).
+      var runway = Math.max(viewH - gap, 1);
+      var progress = (viewH - rect.bottom) / runway;
+      if (progress < 0) progress = 0;
+      if (progress > 1) progress = 1;
+
+      // Hold the first slice at rest (the wordmark just scrolls up),
+      // resolve into the logo across the middle, and let the finished
+      // lockup settle before the page bottoms out.
+      var t = (progress - 0.12) / 0.74;
+      if (t < 0) t = 0;
+      if (t > 1) t = 1;
+      t = t * t * (3 - 2 * t);
+
+      footer.style.setProperty('--outro', t.toFixed(4));
+
+      // Shrink the whole lockup toward the logo size (kept here rather
+      // than in footer.css so it isn't on the background-clip:text
+      // element, which ghosts glyphs in Blink when transformed).
+      var scale = 1 - 0.74 * t;
+
+      // Pin the lockup just below the header's docked logo icon, so the
+      // wordmark clears it with roughly the icon-to-wordmark gap of the
+      // real logo (the line-box leading above the caps supplies it).
+      // transform-origin is center-top, so scale leaves the top edge
+      // put; getBoundingClientRect().top minus the translate we last
+      // applied recovers the natural (unpinned) top.
+      var pin = header ? header.offsetHeight : 72;
+      var naturalTop = lock.getBoundingClientRect().top - ty;
+      ty = naturalTop < pin ? pin - naturalTop : 0;
+
+      lock.style.transform =
+        'translateY(' + ty.toFixed(2) + 'px) scale(' + scale.toFixed(4) + ')';
+    }
+
+    apply();
+    onPageScroll(apply);
   }
 
   /* ------------------------------------------------------------------ */
@@ -1023,9 +1344,12 @@
     safeInit('initDestinationParallax', initDestinationParallax);
     safeInit('initArchitecture', initArchitecture);
     safeInit('initAranya', initAranya);
+    safeInit('initCulinaryTheme', initCulinaryTheme);
+    safeInit('initPrivacyReveal', initPrivacyReveal);
     safeInit('initExperienceSlider', initExperienceSlider);
     safeInit('initExperienceParallax', initExperienceParallax);
     safeInit('initSanctuarySlider', initSanctuarySlider);
+    safeInit('initFooterOutro', initFooterOutro);
   }
 
   if (document.readyState === 'loading') {

@@ -35,4 +35,9 @@
   --hero-stage-gap: clamp(40px, 6vw, 72px);
   --hero-expand-extra: 150vh;
   --hero-parallax-travel: 14%;
+
+  /* Closing reveal: the band left clear above the fixed #journey banner
+     (where the footer settles / the logo lockup pins) — and the length
+     of the footer's scroll runway, viewport minus that band. */
+  --outro-gap: 200px;
 }

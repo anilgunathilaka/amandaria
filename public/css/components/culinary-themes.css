@@ -1,40 +1,18 @@
 /**
- * .culinary-themes — the numbered two-column theme grid in
- * "Culinary Journey". Distinct from .feature-tags: a heavier, slower
- * editorial list rather than an inline tag row.
+ * .culinary-themes — plain, single-column list of culinary themes.
+ * Only the arrangement changed from the previous two-column, numbered,
+ * bordered grid; label typography is untouched.
  */
 
 .culinary-themes {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 clamp(32px, 4vw, 56px);
-  margin-top: clamp(36px, 5vw, 56px);
-}
-
-.culinary-themes__item {
   display: flex;
-  align-items: baseline;
-  gap: 16px;
-  padding: 18px 0;
-  border-bottom: 1px solid var(--color-line);
-}
-
-.culinary-themes__index {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 1.1rem;
-  color: var(--color-accent-strong);
-  flex: none;
+  flex-direction: column;
+  gap: var(--space-5);
+  margin-top: clamp(36px, 5vw, 56px);
 }
 
 .culinary-themes__label {
   font-size: var(--text-body);
   color: var(--color-text-muted);
   font-weight: 300;
-}
-
-@media (max-width: 640px) {
-  .culinary-themes {
-    grid-template-columns: 1fr;
-  }
 }

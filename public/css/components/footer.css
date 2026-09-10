@@ -1,27 +1,19 @@
 /**
- * .site-footer — the closing footer: brand lockup, link groups, and a
- * bottom bar. Defines its own brand-mark classes rather than reaching
- * into .logo (components must not depend on one another's classes).
+ * .site-footer — the closing footer: brand lockup + legal line on one
+ * side, link groups spread across the rest. Defines its own brand-mark
+ * classes rather than reaching into .logo (components must not depend
+ * on one another's classes).
  */
 
 .site-footer {
   background: var(--color-surface-deep);
-  padding: clamp(72px, 8vw, 112px) var(--content-gutter) clamp(32px, 4vw, 48px);
+  padding: clamp(72px, 8vw, 112px) var(--content-gutter) clamp(56px, 6vw, 88px);
 }
 
 .site-footer__top {
   display: grid;
-  grid-template-columns: 1.4fr repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1.4fr repeat(2, minmax(0, 1fr));
   gap: clamp(40px, 5vw, 64px);
-  padding-bottom: clamp(48px, 6vw, 72px);
-  border-bottom: 1px solid var(--color-line);
-}
-
-.site-footer__mark {
-  width: clamp(160px, 18vw, 220px);
-  height: auto;
-  display: block;
-  margin-bottom: 24px;
 }
 
 .site-footer__tagline {
@@ -31,12 +23,35 @@
   margin-bottom: 14px;
 }
 
+.site-footer__contact-btn {
+  margin-bottom: 24px;
+}
+
 .site-footer__statement {
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 500;
   font-size: var(--text-sub);
   color: var(--color-text-soft);
+}
+
+.site-footer__legal {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: clamp(28px, 4vw, 40px);
+}
+
+.site-footer__copyright,
+.site-footer__email {
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--color-text-soft);
+}
+
+.site-footer__email {
+  color: var(--color-text-muted);
 }
 
 .site-footer__group-heading {
@@ -51,11 +66,11 @@
 .site-footer__links {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
 }
 
 .site-footer__link {
-  font-size: 13px;
+  font-size: var(--text-body);
   color: var(--color-text-muted);
   transition: color var(--duration-base) var(--ease-editorial);
 }
@@ -64,24 +79,100 @@
   color: var(--color-text);
 }
 
-.site-footer__bottom {
+.site-footer__social {
+  display: flex;
+  gap: 12px;
+  margin-top: clamp(24px, 3vw, 32px);
+}
+
+.site-footer__social-link {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-  padding-top: clamp(28px, 4vw, 40px);
-}
-
-.site-footer__copyright,
-.site-footer__email {
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  color: var(--color-text-soft);
-}
-
-.site-footer__email {
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: 50%;
   color: var(--color-text-muted);
+  transition:
+    color var(--duration-base) var(--ease-editorial),
+    border-color var(--duration-base) var(--ease-editorial);
+}
+
+.site-footer__social-link svg {
+  width: 16px;
+  height: 16px;
+}
+
+.site-footer__social-link:hover {
+  color: var(--color-accent-strong);
+  border-color: var(--color-accent-strong);
+}
+
+/* Closing brand lockup. At rest it's a large photo-filled signature
+   beneath the link columns; during the page's closing "pinned reveal"
+   (see components/journey-statement.css) main.js scrubs --outro 0 -> 1
+   on .site-footer and pins this block into the band left clear above the
+   fixed banner. Everything else is scrubbed here: the wordmark crossfades
+   from the photo fill to solid gold and scales down while the Vanya Nadi
+   line rises in below — resolving into the brand wordmark. */
+.site-footer__lockup {
+  --wm-width: clamp(20rem, 90vw, 88rem);
+  margin-top: clamp(56px, 7vw, 96px);
+  text-align: center;
+  transform-origin: center top;
+  will-change: transform;
+  pointer-events: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* The wordmark is the Amandaria logo lettering (Amandaria-white-text.webp,
+   mirrored terminal "A" and all) used as a mask over a fill that
+   crossfades from the jungle photo to solid gold as --outro 0 -> 1. The
+   text node is a hidden fallback; width + aspect-ratio give the box its
+   shape. main.js scales the whole lockup toward logo size. */
+.site-footer__wordmark {
+  margin: 0 auto;
+  width: var(--wm-width);
+  aspect-ratio: 3000 / 479;
+  font-size: 0;
+  color: transparent;
+
+  background-color: var(--color-accent-strong);
+  background-image:
+    linear-gradient(var(--wm-veil), var(--wm-veil)),
+    url('/images/Owner-Residence/Exterior-2.webp');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  /* --outro 0: veil transparent, the photo shows. 1: opaque gold. */
+  --wm-veil: color-mix(
+    in srgb,
+    transparent,
+    var(--color-accent-strong) calc(var(--outro, 0) * 100%)
+  );
+
+  -webkit-mask: url('/images/logo/Amandaria-white-text.webp') center / contain
+    no-repeat;
+  mask: url('/images/logo/Amandaria-white-text.webp') center / contain no-repeat;
+}
+
+/* "Vanya Nadi" — the vanya-nadi-text.webp lettering (already gold) as a
+   mask over a solid-gold fill, sized against the wordmark like the real
+   logo lockup. Held out until the wordmark has turned gold, then rises
+   in. */
+.site-footer__wordmark-sub {
+  margin: clamp(0.5rem, 2.2vw, 2rem) auto 0;
+  width: calc(var(--wm-width) * 0.4);
+  aspect-ratio: 1307 / 228;
+  font-size: 0;
+  background-color: var(--color-accent-strong);
+  -webkit-mask: url('/images/logo/vanya-nadi-text.webp') center / contain
+    no-repeat;
+  mask: url('/images/logo/vanya-nadi-text.webp') center / contain no-repeat;
+  opacity: clamp(0, calc((var(--outro, 0) - 0.55) * 4), 1);
+  transform: translateY(calc((1 - var(--outro, 0)) * 0.5rem));
 }
 
 @media (max-width: 900px) {
