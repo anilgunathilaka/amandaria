@@ -4,6 +4,9 @@
  * column on the right. Deliberately skips .wrap and any centering —
  * the image must reach the viewport edge on every screen width, not
  * just the edge of a centered content column.
+ *
+ * Desktop: media | title+copy stacked on the right.
+ * Mobile:  title → media → copy.
  */
 
 #culinary {
@@ -14,15 +17,30 @@
 .culinary {
   display: grid;
   grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  grid-template-areas:
+    'media title'
+    'media copy';
   align-items: stretch;
   column-gap: clamp(48px, 6vw, 96px);
   padding-right: var(--content-gutter);
 }
 
+.culinary__title {
+  grid-area: title;
+  max-width: 42rem;
+  padding-top: var(--section-padding);
+  align-self: start;
+}
+
+.culinary__title .heading-2 {
+  margin-top: var(--space-5);
+}
+
 .culinary__media {
+  grid-area: media;
   margin: 0;
   overflow: hidden;
-  height: 100%;
+  align-self: stretch;
   min-height: 100%;
   background: var(--color-surface-raised);
   /* main.js (13. Culinary Journey) slides this in from the left as the
@@ -38,8 +56,9 @@
 }
 
 .culinary__copy {
+  grid-area: copy;
   max-width: 42rem;
-  padding-top: var(--section-padding);
+  padding-bottom: var(--section-padding);
 }
 
 /* Paragraph and list sit indented a step in from the heading, echoing
@@ -51,6 +70,10 @@
   margin-left: clamp(1.75rem, 4vw, 3.25rem);
 }
 
+.culinary__copy .heading-sub {
+  margin-top: var(--space-5);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .culinary__media {
     will-change: auto;
@@ -60,8 +83,18 @@
 @media (max-width: 960px) {
   .culinary {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      'title'
+      'media'
+      'copy';
     row-gap: clamp(28px, 6vw, 44px);
     padding-right: 0;
+  }
+
+  .culinary__title {
+    padding-top: var(--section-padding);
+    padding-inline: var(--content-gutter);
+    max-width: none;
   }
 
   /* Stacked single-column layout: each item is its own row, so the
@@ -75,6 +108,14 @@
 
   .culinary__copy {
     padding-inline: var(--content-gutter);
+    padding-bottom: var(--section-padding);
     max-width: none;
+  }
+
+  .culinary__copy .heading-sub,
+  .culinary__copy .home-copy,
+  .culinary__copy .culinary-themes,
+  .culinary__copy .culinary__cta {
+    margin-left: 0;
   }
 }

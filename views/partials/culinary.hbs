@@ -1,5 +1,10 @@
 <section class="section section--light" id="culinary" aria-labelledby="culinary-heading">
   <div class="culinary">
+    <div class="culinary__title">
+      <span class="eyebrow">{{culinary.eyebrow}}</span>
+      <h2 id="culinary-heading" class="section-intro__heading heading-2">{{culinary.heading}}</h2>
+    </div>
+
     <figure class="culinary__media" data-culinary-media>
       <img
         src="{{culinary.image.src}}"
@@ -10,8 +15,6 @@
     </figure>
 
     <div class="culinary__copy">
-      <span class="eyebrow">{{culinary.eyebrow}}</span>
-      <h2 id="culinary-heading" class="section-intro__heading heading-2">{{culinary.heading}}</h2>
       <p class="heading-sub">{{culinary.subheading}}</p>
       <div class="home-copy">
         <p class="body-text body-text--lg">{{culinary.body}}</p>
