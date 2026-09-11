@@ -25,6 +25,9 @@
   height: 100%;
   min-height: 100%;
   background: var(--color-surface-raised);
+  /* main.js (13. Culinary Journey) slides this in from the left as the
+     section opens, then lets it drift subtly while in view. */
+  will-change: transform, opacity;
 }
 
 .culinary__media img {
@@ -35,7 +38,7 @@
 }
 
 .culinary__copy {
-  max-width: 34rem;
+  max-width: 42rem;
   padding-top: var(--section-padding);
 }
 
@@ -46,6 +49,12 @@
 .culinary__copy .culinary-themes,
 .culinary__copy .culinary__cta {
   margin-left: clamp(1.75rem, 4vw, 3.25rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .culinary__media {
+    will-change: auto;
+  }
 }
 
 @media (max-width: 960px) {

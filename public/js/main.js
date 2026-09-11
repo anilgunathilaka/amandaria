@@ -10,12 +10,13 @@
  *   7. Philosophy card slider
  *   8. Our Story right-image parallax
  *   9. Destination parallax
- *  10. Architecture split
+ *  10. Architecture intro reveal + split
  *  11. Aranya scroll theme + image travel
  *  12. Experience hour carousel + copy parallax
  *  13. Culinary Journey scroll theme
  *  14. Absolute Privacy hold-and-grow reveal
  *  15. Footer wordmark -> logo lockup (closing reveal)
+ *  16. Final CTA: text runs at 200% speed over a static image
  *
  * No framework, no build step — this file is served as-is.
  */
@@ -80,28 +81,28 @@
       return 1 - Math.pow(1 - t, 3);
     }
 
-    // --- geometry, cached (measured once + on resize / font swap) ------
-    // The header sits over a "light" section whenever one of these spans
-    // the header line; store each span in document coordinates so the
-    // per-frame test is pure arithmetic on scrollY (no getBoundingClientRect).
+    // The header sits over a "light" section whenever a .section--light
+    // spans the header line (hero + footer excluded). Checked live on
+    // scroll so photo-phase / mid-viewport toggles stay in sync.
     var headerH = 72;
-    var lightSpans = [];
+    var footer = document.getElementById('footer');
 
     function measure() {
       headerH = header.offsetHeight || 72;
-      lightSpans = [];
-      var lights = document.querySelectorAll('.section--light, #architecture');
-      var pageY = window.pageYOffset;
-      for (var i = 0; i < lights.length; i += 1) {
-        var r = lights[i].getBoundingClientRect();
-        lightSpans.push([r.top + pageY, r.bottom + pageY]);
-      }
     }
 
     // --- guarded state -------------------------------------------------
     var lastScrolled = null;
     var lastOnLight = null;
+    var lastOnFooter = null;
     var lastE = -1;
+
+    function isLightSection(el) {
+      // Hero and footer stay out of the light/dark header swap —
+      // mid-page light surfaces only (ivory sections).
+      if (!el || el.id === 'top' || el.id === 'footer') return false;
+      return el.classList.contains('section--light');
+    }
 
     function update() {
       var y = window.pageYOffset;
@@ -112,10 +113,14 @@
         if (heroIcon) heroIcon.classList.toggle('is-docked', scrolled);
       }
 
-      var line = y + headerH;
+      // Live check — sections toggle .section--light while scrolling
+      // (Architecture photo phase, Aranya mid-viewport, etc.).
       var onLight = false;
-      for (var i = 0; i < lightSpans.length; i += 1) {
-        if (lightSpans[i][0] < line && lightSpans[i][1] > y) {
+      var lights = document.querySelectorAll('.section--light');
+      for (var i = 0; i < lights.length; i += 1) {
+        if (!isLightSection(lights[i])) continue;
+        var r = lights[i].getBoundingClientRect();
+        if (r.top < headerH && r.bottom > 0) {
           onLight = true;
           break;
         }
@@ -123,6 +128,16 @@
       if (onLight !== lastOnLight) {
         lastOnLight = onLight;
         header.classList.toggle('is-on-light', onLight);
+      }
+
+      var onFooter = false;
+      if (footer) {
+        var fr = footer.getBoundingClientRect();
+        onFooter = fr.top < headerH && fr.bottom > 0;
+      }
+      if (onFooter !== lastOnFooter) {
+        lastOnFooter = onFooter;
+        header.classList.toggle('is-on-footer', onFooter);
       }
 
       if (!heroText) return;
@@ -622,7 +637,7 @@
     ).matches;
 
     function apply() {
-      if (reduceMotion) {
+      if (reduceMotion || window.innerWidth <= 960) {
         if (bg) bg.style.transform = '';
         if (copy) copy.style.transform = '';
         if (scrim) scrim.style.opacity = '';
@@ -661,44 +676,292 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 10. Architecture split: list hover + slow image / fast copy          */
+  /* 10. Architecture scroll sequence                                     */
+  /*     1. Centered intro scales down on white (approach)                */
+  /*     2. Pin holds — intro slides left while cards enter (no white gap) */
+  /*     3. Carousel through the four material studies                    */
+  /*     4. White returns; statement + body copy animate in              */
   /* ------------------------------------------------------------------ */
 
   function initArchitecture() {
     var section = document.getElementById('architecture');
     if (!section) return;
 
-    var items = section.querySelectorAll('.architecture__item');
-    var image = section.querySelector('[data-architecture-image]');
-    var copy = section.querySelector('[data-architecture-copy]');
-    var scrim = section.querySelector('[data-architecture-scrim]');
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    function clamp01(n) {
+      return n < 0 ? 0 : n > 1 ? 1 : n;
+    }
+
+    if (reduceMotion) return;
+
+    var stage = section.querySelector('[data-architecture-stage]');
+    var pin = stage && stage.querySelector('.architecture__pin');
+    var frame = section.querySelector('[data-architecture-intro-frame]');
     var caption = section.querySelector('[data-architecture-caption]');
     var tag = section.querySelector('[data-architecture-tag]');
+    var copy = section.querySelector('[data-architecture-copy]');
+    var slidesRoot = section.querySelector('[data-architecture-slides]');
+    var slideCards = stage.querySelectorAll('.architecture__slide');
+    var backdropImg = section.querySelector('[data-architecture-backdrop-img]');
+    var sampleSlide = slideCards[0];
+    if (!stage || !pin || !frame || !slideCards.length) return;
+
+    var pinH = 0;
+    var scrollSpan = 1;
+    var cardW = 0;
+    var cardStep = 0;
+    var desktopMq = window.matchMedia('(min-width: 961px)');
+
+    function measure() {
+      if (!desktopMq.matches) return;
+      var viewH = window.innerHeight || 1;
+      pinH = pin.offsetHeight || viewH;
+      scrollSpan = Math.max(stage.offsetHeight - pinH, 1);
+      if (sampleSlide) {
+        cardW = sampleSlide.offsetWidth;
+        var track = stage.querySelector('[data-architecture-slides-track]');
+        var gap = track
+          ? parseFloat(window.getComputedStyle(track).columnGap ||
+              window.getComputedStyle(track).gap) || 0
+          : 0;
+        cardStep = cardW + gap;
+      }
+    }
+
+    measure();
+    window.addEventListener(
+      'resize',
+      function () {
+        measure();
+        apply();
+      },
+      { passive: true },
+    );
+
+    function setActive(index) {
+      if (index < 0 || index >= slideCards.length) return;
+
+      var slide = slideCards[index];
+
+      if (caption) {
+        caption.textContent = slide.getAttribute('data-caption') || '';
+      }
+      if (tag) {
+        tag.textContent = slide.getAttribute('data-tag') || '';
+      }
+      if (backdropImg) {
+        backdropImg.setAttribute('src', slide.getAttribute('data-image') || '');
+      }
+    }
+
+    function smoothstep(t) {
+      return t * t * (3 - 2 * t);
+    }
+
+    function easeProgress(t) {
+      return smoothstep(clamp01(t));
+    }
+
+    function apply() {
+      if (!desktopMq.matches) return;
+
+      var rect = stage.getBoundingClientRect();
+      var viewH = window.innerHeight || pinH || 1;
+      var viewW = window.innerWidth;
+      var stageTop = rect.top;
+      var stageBottom = rect.bottom;
+
+      // Entry: scale intro while the stage rises into view.
+      // Pin: scrub only while the sticky frame is actually holding —
+      // same top/bottom gate the hero expand uses.
+      var entryP = clamp01((viewH - stageTop) / viewH);
+      var pinP = 0;
+
+      if (stageTop <= 0 && stageBottom > pinH) {
+        pinP = clamp01(-stageTop / scrollSpan);
+      } else if (stageBottom <= pinH) {
+        pinP = 1;
+      }
+
+      // Pinned beats: delay → transition → carousel → white wipe → copy → release.
+      var DELAY_END = 0.05;
+      var TRANS_END = 0.38;
+      var CAROUSEL_START = 0.4;
+      var CAROUSEL_END = 0.78;
+      var COPY_END = 0.95;
+
+      // Phase 1 — scale the centered intro while approaching the pin.
+      var p1 = easeProgress(entryP);
+
+      // Phase 2 — intro off-screen while cards enter (one transition).
+      var pTransRaw =
+        pinP < DELAY_END
+          ? 0
+          : clamp01((pinP - DELAY_END) / (TRANS_END - DELAY_END));
+      var pTrans = easeProgress(pTransRaw);
+      var textP = pTrans;
+      var imageP = easeProgress((pTransRaw - 0.04) / 0.96);
+
+      // Phase 3 — carousel through four material cards.
+      var p4 =
+        pinP < CAROUSEL_START
+          ? 0
+          : pinP >= CAROUSEL_END
+            ? 1
+            : easeProgress((pinP - CAROUSEL_START) / (CAROUSEL_END - CAROUSEL_START));
+
+      // Phase 4 — white sheet + copy slide in together R→L.
+      var pCopy =
+        pinP < CAROUSEL_END
+          ? 0
+          : pinP >= COPY_END
+            ? 1
+            : easeProgress((pinP - CAROUSEL_END) / (COPY_END - CAROUSEL_END));
+
+      var scale = 1.5 - p1 * 0.72;
+      var introExit = viewW * 1.12;
+      var introX = textP * -introExit;
+      var introY = 0;
+      var introOpacity = 1;
+      var captionOpacity = 0;
+      var whiteX = -imageP * viewW;
+      var backdropX = (1 - imageP) * viewW;
+      var slidesOpacity = 1;
+      var copyOpacity = 0;
+      var slideW = cardW || viewW * 0.42;
+      var step = cardStep || slideW + 40;
+      var centerX = (viewW - slideW) / 2;
+      var slideX = centerX + (1 - imageP) * (viewW - centerX);
+      var activeIndex = 0;
+
+      function cardX(index) {
+        return centerX - index * step;
+      }
+
+      if (pinP >= CAROUSEL_END) {
+        whiteX = viewW * (1 - pCopy);
+        slidesOpacity = 1 - easeProgress((pCopy - 0.88) / 0.12);
+        copyOpacity = easeProgress(pCopy / 0.18);
+        introOpacity = 0;
+        captionOpacity = 1 - easeProgress(pCopy / 0.22);
+        activeIndex = slideCards.length - 1;
+        slideX = cardX(activeIndex);
+        backdropX = 0;
+      } else if (pinP >= CAROUSEL_START) {
+        whiteX = -viewW;
+        backdropX = 0;
+        introOpacity = 0;
+        activeIndex = Math.min(
+          slideCards.length - 1,
+          Math.floor(p4 * slideCards.length),
+        );
+        slideX = cardX(0) - p4 * (slideCards.length - 1) * step;
+        captionOpacity = 1;
+      } else if (imageP > 0) {
+        introOpacity = 1 - easeProgress(imageP / 0.55);
+        captionOpacity = easeProgress(imageP / 0.72);
+      } else if (pinP >= TRANS_END) {
+        introOpacity = 1 - easeProgress((pinP - TRANS_END) / 0.08);
+      }
+
+      section.style.setProperty('--architecture-intro-scale', scale.toFixed(3));
+      section.style.setProperty('--architecture-intro-x', introX.toFixed(1) + 'px');
+      section.style.setProperty('--architecture-intro-y', introY.toFixed(1) + 'px');
+      section.style.setProperty(
+        '--architecture-intro-opacity',
+        introOpacity.toFixed(3),
+      );
+      section.style.setProperty('--architecture-slide-x', slideX.toFixed(1) + 'px');
+      section.style.setProperty(
+        '--architecture-caption-opacity',
+        captionOpacity.toFixed(3),
+      );
+      section.style.setProperty('--architecture-white-x', whiteX.toFixed(1) + 'px');
+      section.style.setProperty('--architecture-backdrop-x', backdropX.toFixed(1) + 'px');
+      section.style.setProperty(
+        '--architecture-copy-opacity',
+        copyOpacity.toFixed(3),
+      );
+      section.style.setProperty(
+        '--architecture-slides-opacity',
+        slidesOpacity.toFixed(3),
+      );
+
+      if (slidesRoot) {
+        slidesRoot.setAttribute(
+          'aria-hidden',
+          imageP <= 0 && pinP < CAROUSEL_END ? 'true' : 'false',
+        );
+      }
+
+      if (copy) {
+        copy.setAttribute('aria-hidden', copyOpacity > 0.08 ? 'false' : 'true');
+      }
+
+      pin.classList.toggle(
+        'is-text-sliding',
+        pinP >= DELAY_END && pinP < TRANS_END,
+      );
+
+      section.classList.toggle(
+        'is-photo',
+        imageP > 0.2 && pCopy < 0.12,
+      );
+      // White intro / copy = light chrome; photo carousel = dark chrome.
+      section.classList.toggle(
+        'section--light',
+        !(imageP > 0.2 && pCopy < 0.12),
+      );
+      section.classList.toggle('is-copy-phase', copyOpacity > 0.02);
+
+      if (imageP > 0 || pinP >= CAROUSEL_START) {
+        setActive(activeIndex);
+      }
+    }
+
+    apply();
+    onPageScroll(apply);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* 11. Aranya: mid-viewport charcoal + fast image travel (no zoom),     */
+  /*     feature tags swap the panel photograph on click                  */
+  /* ------------------------------------------------------------------ */
+
+  function initAranya() {
+    var section = document.getElementById('aranya');
+    if (!section) return;
+
+    var media = section.querySelector('[data-aranya-image]');
+    var image = media && media.querySelector('.media-fill');
+    var caption = media && media.querySelector('[data-aranya-caption]');
+    var tags = section.querySelectorAll('.feature-tags__item');
     var reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
     var fadeTimer = 0;
 
-    function showMaterial(target) {
-      if (!target) return;
+    function showFeature(target) {
+      if (!target || !image) return;
 
-      for (var i = 0; i < items.length; i += 1) {
-        var on = items[i] === target;
-        items[i].classList.toggle('is-active', on);
-        items[i].setAttribute('aria-pressed', on ? 'true' : 'false');
+      for (var i = 0; i < tags.length; i += 1) {
+        var on = tags[i] === target;
+        tags[i].classList.toggle('is-active', on);
+        tags[i].setAttribute('aria-pressed', on ? 'true' : 'false');
       }
 
       var src = target.getAttribute('data-image');
       var nextAlt = target.getAttribute('data-alt') || '';
       var nextCaption = target.getAttribute('data-caption') || '';
-      var nextTag = target.getAttribute('data-tag') || '';
-      if (!image || !src || image.getAttribute('src') === src) return;
+      if (!src || image.getAttribute('src') === src) return;
 
       function applySource() {
         image.setAttribute('src', src);
         image.setAttribute('alt', nextAlt);
-        if (caption) caption.textContent = nextCaption;
-        if (tag) tag.textContent = nextTag;
+        if (caption && nextCaption) caption.textContent = nextCaption;
         image.classList.remove('is-fading');
       }
 
@@ -712,73 +975,16 @@
       fadeTimer = window.setTimeout(applySource, 180);
     }
 
-    for (var i = 0; i < items.length; i += 1) {
-      var preloadSrc = items[i].getAttribute('data-image');
+    for (var t = 0; t < tags.length; t += 1) {
+      var preloadSrc = tags[t].getAttribute('data-image');
       if (preloadSrc) {
         var preload = new Image();
         preload.src = preloadSrc;
       }
-      items[i].addEventListener('mouseenter', function () {
-        showMaterial(this);
-      });
-      items[i].addEventListener('focus', function () {
-        showMaterial(this);
-      });
-      items[i].addEventListener('click', function () {
-        showMaterial(this);
+      tags[t].addEventListener('click', function () {
+        showFeature(this);
       });
     }
-
-    function apply() {
-      if (reduceMotion || window.innerWidth <= 960) {
-        if (image) image.style.transform = '';
-        if (copy) copy.style.transform = '';
-        if (scrim) scrim.style.opacity = '';
-        return;
-      }
-
-      var rect = section.getBoundingClientRect();
-      var viewH = window.innerHeight;
-      var span = viewH + rect.height;
-      if (span <= 0) return;
-
-      var progress = (viewH - rect.top) / span;
-      if (progress < 0) progress = 0;
-      if (progress > 1) progress = 1;
-
-      var fromCenter = progress - 0.5;
-      var slowTravel = Math.min(rect.height * 0.1, 56);
-      var fastTravel = Math.min(viewH * 0.55, 420);
-
-      if (image) {
-        image.style.transform =
-          'translate3d(0,' + (fromCenter * slowTravel).toFixed(2) + 'px,0)';
-      }
-      if (copy) {
-        copy.style.transform =
-          'translate3d(0,' + (-fromCenter * fastTravel).toFixed(2) + 'px,0)';
-      }
-      if (scrim) {
-        scrim.style.opacity = (1 - Math.pow(progress, 1.45) * 0.55).toFixed(3);
-      }
-    }
-
-    apply();
-    onPageScroll(apply);
-  }
-
-  /* ------------------------------------------------------------------ */
-  /* 11. Aranya: mid-viewport charcoal + fast image travel (no zoom)      */
-  /* ------------------------------------------------------------------ */
-
-  function initAranya() {
-    var section = document.getElementById('aranya');
-    if (!section) return;
-
-    var media = section.querySelector('[data-aranya-image]');
-    var reduceMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
 
     function apply() {
       var dark = section.getBoundingClientRect().top <= window.innerHeight / 2;
@@ -814,18 +1020,66 @@
   }
 
   /* ------------------------------------------------------------------ */
-  /* 13. Culinary Journey: white until the section reaches mid-viewport,  */
-  /*     then back to the section's original background.                  */
+  /* 13. Culinary Journey: split-screen cinematic entrance + scroll theme  */
+  /*     White until the section reaches mid-viewport, then back to its   */
+  /*     original background. As the section opens, the photograph slides */
+  /*     in from the left and settles with a gentle scale, then drifts    */
+  /*     subtly (continuous parallax) for as long as it's in view. The    */
+  /*     copy panel is static — text doesn't animate.                     */
   /* ------------------------------------------------------------------ */
 
   function initCulinaryTheme() {
     var section = document.getElementById('culinary');
     if (!section) return;
 
+    var media = section.querySelector('[data-culinary-media]');
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    function clamp01(n) {
+      return n < 0 ? 0 : n > 1 ? 1 : n;
+    }
+
+    function smoothstep(t) {
+      return t * t * (3 - 2 * t);
+    }
 
     function apply() {
-      var passedHalf = section.getBoundingClientRect().top <= window.innerHeight / 2;
+      var rect = section.getBoundingClientRect();
+      var viewH = window.innerHeight;
+
+      var passedHalf = rect.top <= viewH / 2;
       section.classList.toggle('section--light', !passedHalf);
+
+      if (!media) return;
+
+      if (reduceMotion || window.innerWidth <= 960) {
+        media.style.transform = '';
+        media.style.opacity = '';
+        return;
+      }
+
+      var span = viewH + rect.height;
+      if (span <= 0) return;
+
+      var progress = clamp01((viewH - rect.top) / span);
+      var fromCenter = progress - 0.5;
+
+      // Slides in from the left as the section opens (0 -> ~0.5), then
+      // just drifts a little vertically while the section is in view.
+      var mediaEnter = smoothstep(clamp01((progress - 0.08) / 0.42));
+      var slide = Math.min(window.innerWidth * 0.1, 140);
+      var driftY = fromCenter * Math.min(viewH * 0.1, 80);
+      media.style.transform =
+        'translate3d(' +
+        (-slide * (1 - mediaEnter)).toFixed(2) +
+        'px,' +
+        driftY.toFixed(2) +
+        'px,0) scale(' +
+        (0.96 + 0.04 * mediaEnter).toFixed(3) +
+        ')';
+      media.style.opacity = (0.82 + 0.18 * mediaEnter).toFixed(3);
     }
 
     apply();
@@ -1189,7 +1443,9 @@
   /*     past underneath. Scrolling through that extra height drives      */
   /*     scale 0.8→1 and opacity 0.8→1; once full size is reached the     */
   /*     frame just holds there until the stage runs out and it          */
-  /*     releases to scroll away normally.                                */
+  /*     releases to scroll away normally. Once held (the page appears   */
+  /*     to "stop"), the tree watermark keeps growing on its own for the  */
+  /*     length of that hold, reaching full bloom right as it releases.  */
   /* ------------------------------------------------------------------ */
 
   function initPrivacyReveal() {
@@ -1197,11 +1453,20 @@
     var frame = document.querySelector('[data-privacy-frame]');
     if (!stage || !frame) return;
 
+    var mark = frame.querySelector('.privacy-section__mark');
+
     var reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
-    if (reduceMotion) return;
+    if (reduceMotion || window.innerWidth <= 960) return;
 
+    function clamp01(n) {
+      return n < 0 ? 0 : n > 1 ? 1 : n;
+    }
+
+    function smoothstep(t) {
+      return t * t * (3 - 2 * t);
+    }
 
     function apply() {
       var rect = stage.getBoundingClientRect();
@@ -1215,15 +1480,28 @@
       // the 100vh pin fills the screen). Whatever stage height remains
       // beyond that is where the fully-grown frame holds before it
       // releases.
-      var progress = (viewH - rect.top) / viewH;
-      if (progress < 0) progress = 0;
-      if (progress > 1) progress = 1;
+      var progress = clamp01((viewH - rect.top) / viewH);
 
       var scale = (0.8 + 0.2 * progress).toFixed(3);
       var opacity = (0.8 + 0.2 * progress).toFixed(3);
 
       frame.style.transform = 'scale(' + scale + ')';
       frame.style.opacity = opacity;
+
+      if (mark) {
+        // Once the frame is fully pinned (progress reaches 1, i.e. the
+        // page appears to "stop"), keep growing just the watermark —
+        // matches .privacy-section__pin's own height (100vh - 300px) so
+        // the growth spans exactly the hold, finishing right as the
+        // section releases.
+        var pinH = Math.max(viewH - 300, 1);
+        var holdSpan = Math.max(rect.height - pinH, 1);
+        var hold = smoothstep(clamp01(-rect.top / holdSpan));
+
+        mark.style.transform =
+          'translate(-50%,-50%) scale(' + (1 + hold * 1.15).toFixed(3) + ')';
+        mark.style.opacity = (0.132 + hold * 0.108).toFixed(3);
+      }
     }
 
     apply();
@@ -1318,6 +1596,52 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* 16. Final CTA: text runs at 200% speed, image stays put              */
+  /*     Same fromCenter parallax math the copy panes use elsewhere       */
+  /*     (destination, architecture), but the photograph behind it is     */
+  /*     static — only .final-cta__content moves, at double the usual     */
+  /*     travel distance.                                                 */
+  /* ------------------------------------------------------------------ */
+
+  function initFinalCta() {
+    var section = document.getElementById('final-cta');
+    var content = section && section.querySelector('[data-final-cta-content]');
+    if (!section || !content) return;
+
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    function apply() {
+      if (reduceMotion || window.innerWidth <= 960) {
+        content.style.transform = '';
+        return;
+      }
+
+      var rect = section.getBoundingClientRect();
+      var viewH = window.innerHeight;
+      var span = viewH + rect.height;
+      if (span <= 0) return;
+
+      var progress = (viewH - rect.top) / span;
+      if (progress < 0) progress = 0;
+      if (progress > 1) progress = 1;
+
+      var fromCenter = progress - 0.5;
+      // 200% of a normal copy-pane travel (compare brand/destination's
+      // ~0.7 * viewH) — the text runs noticeably faster than the static
+      // backdrop behind it.
+      var travel = Math.min(viewH * 1.4, 1080);
+
+      content.style.transform =
+        'translate3d(0,' + (-fromCenter * travel).toFixed(2) + 'px,0)';
+    }
+
+    apply();
+    onPageScroll(apply);
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Boot                                                                  */
   /* ------------------------------------------------------------------ */
 
@@ -1350,6 +1674,7 @@
     safeInit('initExperienceParallax', initExperienceParallax);
     safeInit('initSanctuarySlider', initSanctuarySlider);
     safeInit('initFooterOutro', initFooterOutro);
+    safeInit('initFinalCta', initFinalCta);
   }
 
   if (document.readyState === 'loading') {

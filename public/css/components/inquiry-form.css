@@ -73,6 +73,12 @@
 .inquiry-form__submit {
   margin-top: 8px;
   align-self: flex-start;
+  /* .btn--primary's background is --color-text, which .section--light
+     remaps to navy here — its default near-black label reads poorly
+     against that, so keep this one label gold instead. (Its :hover
+     state is untouched: .btn--primary:hover already sets a dark label
+     against the button's gold hover background.) */
+  color: var(--color-accent-strong);
 }
 
 .inquiry-form__success {

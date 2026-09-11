@@ -26,6 +26,15 @@
   z-index: 2;
   max-width: 900px;
   margin-inline: auto;
+  /* main.js (16. Final CTA) runs this at 200% speed on scroll — the
+     photograph behind it stays put. */
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .final-cta__content {
+    will-change: auto;
+  }
 }
 
 .final-cta__heading {

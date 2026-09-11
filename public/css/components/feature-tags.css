@@ -1,7 +1,8 @@
 /**
  * .feature-tags — a short inline list of standout features (used in
  * "The Aranya"). Deliberately sharp-edged, divided by hairlines rather
- * than pill shapes.
+ * than pill shapes. Each item is a button: clicking one swaps the
+ * section's photograph (see initAranya in main.js).
  */
 
 .feature-tags {
@@ -11,19 +12,36 @@
 }
 
 .feature-tags__item {
+  appearance: none;
+  background: none;
+  border: none;
+  border-left: 1px solid var(--color-line-strong);
+  font-family: inherit;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: var(--tracking-nav);
   text-transform: uppercase;
   color: var(--color-text-muted);
   padding: 4px 22px;
-  border-left: 1px solid var(--color-line-strong);
   line-height: 1.4;
+  cursor: pointer;
+  transition: color var(--duration-base) var(--ease-editorial);
 }
 
 .feature-tags__item:first-child {
   padding-left: 0;
   border-left: none;
+}
+
+.feature-tags__item:hover,
+.feature-tags__item:focus-visible,
+.feature-tags__item.is-active {
+  color: var(--color-accent-strong);
+}
+
+.feature-tags__item:focus-visible {
+  outline: 1px solid var(--color-accent-strong);
+  outline-offset: 4px;
 }
 
 @media (max-width: 560px) {
@@ -36,6 +54,7 @@
     padding: 0 0 14px;
     border-left: none;
     border-bottom: 1px solid var(--color-line);
+    text-align: left;
   }
 
   .feature-tags__item:last-child {

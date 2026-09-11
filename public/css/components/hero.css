@@ -187,6 +187,7 @@
 @media (max-width: 720px) {
   .hero__title {
     font-size: clamp(1.05rem, 4.5vw, 1.84rem);
+    white-space: normal;
   }
 
   .hero__caption {

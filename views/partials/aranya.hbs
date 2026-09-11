@@ -15,7 +15,7 @@
       </div>
       <div class="art-panel__frame"></div>
       <div class="art-panel__caption">
-        <span class="art-panel__caption-text">{{aranya.panelCaption}}</span>
+        <span class="art-panel__caption-text" data-aranya-caption>{{aranya.panelCaption}}</span>
       </div>
     </div>
 
@@ -28,7 +28,14 @@
       </div>
       <div class="feature-tags">
         {{#each aranya.features}}
-          <span class="feature-tags__item">{{this}}</span>
+          <button
+            type="button"
+            class="feature-tags__item"
+            data-image="{{this.image.src}}"
+            data-alt="{{this.image.alt}}"
+            data-caption="{{this.caption}}"
+            aria-pressed="false"
+          >{{this.label}}</button>
         {{/each}}
       </div>
       <a class="text-link" href="{{aranya.cta.href}}">

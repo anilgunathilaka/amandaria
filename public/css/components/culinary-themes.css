@@ -1,18 +1,57 @@
 /**
- * .culinary-themes — plain, single-column list of culinary themes.
- * Only the arrangement changed from the previous two-column, numbered,
- * bordered grid; label typography is untouched.
+ * .culinary-themes — a single inline row of culinary themes, divided by
+ * hairlines (the same treatment as .feature-tags), wrapping to a second
+ * line only if the column is too narrow to hold them all.
  */
 
 .culinary-themes {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-5);
-  margin-top: clamp(36px, 5vw, 56px);
+  flex-wrap: wrap;
+  row-gap: var(--space-3);
+  margin-top: clamp(28px, 4vw, 44px);
+}
+
+.culinary-themes__item {
+  padding: 0 clamp(4px, 0.6vw, 10px);
+  border-left: 1px solid var(--color-line);
+}
+
+.culinary-themes__item:first-child {
+  padding-left: 0;
+  border-left: none;
 }
 
 .culinary-themes__label {
-  font-size: var(--text-body);
+  /* A phrase, not a short tag — normal case/spacing keeps it compact
+     enough to sit on one line (uppercase + wide tracking, as used for
+     GLASS/TIMBER-style tags elsewhere, would run far too wide here). */
+  font-size: 0.72rem;
+  font-weight: 400;
   color: var(--color-text-muted);
-  font-weight: 300;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .culinary-themes {
+    flex-direction: column;
+    row-gap: 14px;
+  }
+
+  .culinary-themes__item {
+    padding: 0 0 14px;
+    border-left: none;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .culinary-themes__item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .culinary-themes__label {
+    /* Stacked here, so there's no one-line width to protect — read
+       comfortably at the standard body size instead. */
+    font-size: var(--text-body);
+    white-space: normal;
+  }
 }

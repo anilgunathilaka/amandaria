@@ -18,8 +18,8 @@
   --space-11: 88px;
 
   /* Section vertical rhythm */
-  --section-padding: clamp(80px, 10vw, 132px);
-  --section-padding-tight: clamp(56px, 7vw, 96px);
+  --section-padding: clamp(64px, 10vw, 132px);
+  --section-padding-tight: clamp(48px, 7vw, 96px);
 
   /* Shared horizontal layout */
   --content-max-width: 1560px;
@@ -35,6 +35,7 @@
   --hero-stage-gap: clamp(40px, 6vw, 72px);
   --hero-expand-extra: 150vh;
   --hero-parallax-travel: 14%;
+  --architecture-pin-extra: 680vh;
 
   /* Closing reveal: the band left clear above the fixed #journey banner
      (where the footer settles / the logo lockup pins) — and the length

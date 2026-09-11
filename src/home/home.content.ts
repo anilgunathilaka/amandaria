@@ -32,6 +32,12 @@ export interface SanctuaryItem {
   image: ContentImage;
 }
 
+export interface AranyaFeature {
+  label: string;
+  image: ContentImage;
+  caption: string;
+}
+
 export interface DestinationTag {
   label: string;
   body: string;
@@ -144,7 +150,7 @@ export const homeContent = {
       {
         index: '01',
         title: 'The Canopy',
-        body: 'Elevated spaces immersed in jungle, where every room opens onto the forest rather than shutting it out.',
+        body: 'Elevated rooms that open onto the forest.',
         image: {
           src: '/images/Pods/Pods_Exterior_2.webp',
           alt: 'A private pavilion with a circular plunge pool, nested in misty jungle canopy.',
@@ -153,7 +159,7 @@ export const homeContent = {
       {
         index: '02',
         title: 'The River',
-        body: 'The wild Vanya Nadi flows through the experience — heard before it is seen, felt long after it is left.',
+        body: 'Wild river heard before seen, felt after.',
         image: {
           src: '/images/Villa/Villa_exterior-river-view.webp',
           alt: 'A curved timber villa on a forested hillside at dawn, the wild river winding through the misted valley below.',
@@ -162,7 +168,7 @@ export const homeContent = {
       {
         index: '03',
         title: 'The View',
-        body: 'Floor-to-ceiling vistas frame the dramatic mountain terrain, dissolving the boundary between shelter and sky.',
+        body: 'Vistas dissolve the line between shelter and sky.',
         image: {
           src: '/images/Villa/Villa_bed.webp',
           alt: 'A bedroom opening through floor-to-ceiling glass onto misted forested hills.',
@@ -171,7 +177,7 @@ export const homeContent = {
       {
         index: '04',
         title: 'The Silence',
-        body: 'A retreat designed around stillness and privacy — unhurried, unscheduled, entirely your own.',
+        body: 'Stillness and privacy — unhurried, entirely yours.',
         image: {
           src: '/images/Pool-Spa/interior.webp',
           alt: 'The spa’s circular rain shower falling into a still, shadowed pool.',
@@ -204,6 +210,11 @@ export const homeContent = {
   architecture: {
     eyebrow: 'Architecture & Design',
     heading: 'Architecture That Breathes With the Wild.',
+    introHeadingLines: [
+      'Architecture That',
+      'Breathes With',
+      'The Wild.',
+    ],
     statement: 'Architecture does not tame the landscape; it frames it.',
     body: 'Built on principles of Tropical Modernism and minimalist jungle aesthetics, our structures — ranging from elevated river pavilion sanctuaries to sculptural, stump-inspired private villas — dissolve the barrier between inside and out.',
     materials: [
@@ -261,7 +272,42 @@ export const homeContent = {
     heading: 'Aranya',
     subheading: 'Your sanctuary above the river.',
     body: 'Inside your river pavilion, clean lines, organic textures, and tropical modernism take centre stage. Floor-to-ceiling glass frames untamed green vistas, blurring the boundary between indoor luxury and the wild river rushing past below. Unwind on oversized daybeds, or soak in a private plunge pool suspended under the open jungle canopy.',
-    features: ['Private Deck', 'River Views', 'Plunge Pool', 'Canopy Immersion'],
+    // Each feature swaps the panel photograph on click — see
+    // initAranya (main.js) and [data-aranya-image].
+    features: [
+      {
+        label: 'Private Deck',
+        image: {
+          src: '/images/Villa/Villa_upper_deck.webp',
+          alt: 'A curved private deck with loungers beside an infinity-edge plunge pool at sunset.',
+        },
+        caption: 'Aranya · Private Deck',
+      },
+      {
+        label: 'River Views',
+        image: {
+          src: '/images/Pods/Pods_Exterior_2_riwer_view.webp',
+          alt: 'A pavilion with a plunge pool overlooking the river winding through the misted valley.',
+        },
+        caption: 'Aranya · River Views',
+      },
+      {
+        label: 'Plunge Pool',
+        image: {
+          src: '/images/Pods/Pods_Exterior_2.webp',
+          alt: 'A private pavilion with a circular plunge pool, nested in misty jungle canopy.',
+        },
+        caption: 'Aranya · Plunge Pool',
+      },
+      {
+        label: 'Canopy Immersion',
+        image: {
+          src: '/images/Owner-Residence/Terrace.webp',
+          alt: 'A woven-canopy terrace lounge open to the forested mountain view.',
+        },
+        caption: 'Aranya · Canopy Immersion',
+      },
+    ] as AranyaFeature[],
     cta: { label: 'Explore Your Sanctuary', href: '#experience' } as CtaLink,
     panelCaption: 'Aranya · River Pavilion',
     image: {
@@ -279,7 +325,7 @@ export const homeContent = {
       {
         time: '06:00',
         title: 'Awaken in the Canopy',
-        body: 'Mist rolls across the mountains. Step onto your private floating deck as the cool breeze carries the scent of wild pepper and earth.',
+        body: 'Mist rolls across the mountains at dawn.',
         image: {
           src: '/images/Owner-Residence/Bedroom-1.webp',
           alt: 'Morning light in a private bedroom looking out into the forest.',
@@ -288,7 +334,7 @@ export const homeContent = {
       {
         time: '09:00',
         title: 'Morning Stillness',
-        body: 'Locally harvested Ceylon tea on your private deck, as the valley slowly emerges from the fog below.',
+        body: 'Ceylon tea as the valley emerges below.',
         image: {
           src: '/images/Owner-Residence/Terrace.webp',
           alt: 'A private terrace set above the canopy, ready for a quiet morning.',
@@ -297,7 +343,7 @@ export const homeContent = {
       {
         time: '13:00',
         title: 'Into the Wild',
-        body: 'Discover the surrounding landscape at the unhurried pace of your own choosing.',
+        body: 'The landscape at your own unhurried pace.',
         image: {
           src: '/images/Pods/Pods_Exterior_1_dark.webp',
           alt: 'A forest pavilion stepping out into the surrounding jungle.',
@@ -306,7 +352,7 @@ export const homeContent = {
       {
         time: '17:30',
         title: 'Golden Hour',
-        body: 'Watch the mountains disappear into mist as the light turns low and amber.',
+        body: 'Mountains dissolve into mist at golden hour.',
         image: {
           src: '/images/Pool-Spa/exterior-1.webp',
           alt: 'The infinity pool terrace looking toward the hills at late light.',
@@ -315,7 +361,7 @@ export const homeContent = {
       {
         time: '20:00',
         title: 'Under the Stars',
-        body: 'Contemporary Sri Lankan dining beneath a vast, unpolluted night sky.',
+        body: 'Dining beneath a vast unpolluted night sky.',
         image: {
           src: '/images/Restaurant/Restaurant_Exterior _2-dark.webp',
           alt: 'The dining pavilion at dusk, lit for an evening under the open sky.',

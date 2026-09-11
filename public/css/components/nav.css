@@ -95,6 +95,13 @@
   width: var(--header-logo-icon);
   height: auto;
   display: block;
+  transition: filter var(--duration-base) var(--ease-editorial);
+}
+
+/* Dark backgrounds (photos, navy sections): white logo, matching menu.
+   Footer keeps the original mark — no white invert there. */
+.site-header.is-scrolled:not(.is-on-light):not(.is-on-footer) .site-header__logo-icon {
+  filter: brightness(0) invert(1);
 }
 
 .site-header__actions {
@@ -194,6 +201,14 @@
 
   .site-header__actions .btn--small {
     padding-inline: 14px;
+  }
+
+  .site-header__logo-icon {
+    width: clamp(36px, 10vw, 48px);
+  }
+
+  .menu-toggle__label {
+    display: none;
   }
 }
 

@@ -12,6 +12,16 @@
   margin-left: clamp(2rem, 5.5vw, 4.75rem);
 }
 
+@media (max-width: 960px) {
+  .aranya__body {
+    margin-left: 0;
+  }
+
+  .aranya__copy .feature-tags {
+    margin-top: var(--space-8);
+  }
+}
+
 .aranya__body .heading-sub {
   margin-top: var(--space-5);
   font-style: italic;
@@ -29,9 +39,22 @@
   will-change: transform;
 }
 
+/* Crossfade when a feature tag swaps the photograph (initAranya). */
+.aranya__media .media-fill {
+  transition: opacity var(--duration-fast) var(--ease-editorial);
+}
+
+.aranya__media .media-fill.is-fading {
+  opacity: 0;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .aranya__media {
     will-change: auto;
     transform: none;
+  }
+
+  .aranya__media .media-fill {
+    transition: none;
   }
 }

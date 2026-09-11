@@ -25,17 +25,21 @@
    which — since the next section sits with zero gap right after this
    one — happens exactly when the next section has advanced
    (viewport height − pin height) past the bottom edge. Shrinking the
-   pin to 100vh − 300px means that's 300px, so this section keeps
+   pin to 100vh − 240px means that's 240px, so this section keeps
    scrolling together with the next one from that point on rather than
    holding until it's fully clear. padding-top restores the frame to
    true viewport-center despite the shorter box: for a flex box of
    height (100vh − S) with align-items:center, padding-top must be S
-   (not S/2) for the centered content to land at exactly 50vh. */
+   (not S/2) for the centered content to land at exactly 50vh. This S
+   also doubles as literal top padding for the brief moment before the
+   pin has actually stuck (it's still in normal flow right after the
+   previous section) — 240px (was 300px) keeps that hand-off gap 20%
+   tighter. Keep in sync with initPrivacyReveal's pinH in main.js. */
 .privacy-section__pin {
   position: sticky;
   top: 0;
-  height: calc(100vh - 300px);
-  padding-top: 300px;
+  height: calc(100vh - 240px);
+  padding-top: 240px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -47,6 +51,21 @@
   margin-inline: auto;
   transform: scale(0.8);
   opacity: 0.8;
+  will-change: transform, opacity;
+}
+
+.privacy-section__mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(260px, 60%);
+  height: auto;
+  transform: translate(-50%, -50%);
+  opacity: 0.132;
+  pointer-events: none;
+  z-index: 0;
+  /* main.js (14. Absolute Privacy) keeps growing this once the frame's
+     own entrance is done and the page holds — see initPrivacyReveal. */
   will-change: transform, opacity;
 }
 
@@ -65,18 +84,42 @@
     transform: none;
     opacity: 1;
   }
+
+  .privacy-section__mark {
+    will-change: auto;
+  }
 }
 
-.privacy-section__mark {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: min(260px, 60%);
-  height: auto;
-  transform: translate(-50%, -50%);
-  opacity: 0.132;
-  pointer-events: none;
-  z-index: 0;
+@media (max-width: 960px) {
+  .privacy-section {
+    padding-block: var(--section-padding);
+  }
+
+  .privacy-section__stage {
+    height: auto;
+  }
+
+  .privacy-section__pin {
+    position: relative;
+    height: auto;
+    padding-top: 0;
+  }
+
+  .privacy-section__frame {
+    transform: none;
+    opacity: 1;
+    max-width: min(900px, 100%);
+    padding-inline: var(--content-gutter);
+  }
+
+  .privacy-section__heading {
+    font-size: clamp(2rem, 9vw, var(--text-display));
+  }
+
+  .privacy-section__mark {
+    width: min(180px, 48%);
+    will-change: auto;
+  }
 }
 
 .privacy-section__eyebrow {
