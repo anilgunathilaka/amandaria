@@ -7,7 +7,8 @@
 
 .site-footer {
   background: var(--color-surface-deep);
-  padding: clamp(72px, 8vw, 112px) var(--content-gutter) clamp(56px, 6vw, 88px);
+  padding-block: clamp(72px, 8vw, 112px) clamp(56px, 6vw, 88px);
+  padding-inline: 0;
 }
 
 .site-footer__top {

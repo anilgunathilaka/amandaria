@@ -1,25 +1,41 @@
 /**
  * .aranya — river pavilion copy beside a framed photograph.
- * Heading and feature tags sit on the left edge; the italic line
- * and body share a single indent underneath.
+ * Desktop: intro + tags on the left, media on the right.
+ * Mobile:  intro → media → tags / CTA.
  */
 
-.aranya__copy .heading-2 {
+.aranya {
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  grid-template-areas:
+    'intro media'
+    'aside media';
+  column-gap: clamp(40px, 6vw, 100px);
+  row-gap: clamp(32px, 4vw, 48px);
+  align-items: start;
+}
+
+.aranya__intro {
+  grid-area: intro;
+}
+
+.aranya__media {
+  grid-area: media;
+  align-self: stretch;
+  will-change: transform;
+}
+
+.aranya__aside {
+  grid-area: aside;
+  align-self: end;
+}
+
+.aranya__intro .heading-2 {
   margin-top: var(--space-5);
 }
 
 .aranya__body {
   margin-left: clamp(2rem, 5.5vw, 4.75rem);
-}
-
-@media (max-width: 960px) {
-  .aranya__body {
-    margin-left: 0;
-  }
-
-  .aranya__copy .feature-tags {
-    margin-top: var(--space-8);
-  }
 }
 
 .aranya__body .heading-sub {
@@ -31,12 +47,12 @@
   margin-top: var(--space-5);
 }
 
-.aranya__copy .feature-tags {
-  margin-top: clamp(40px, 6vw, 72px);
+.aranya__aside .feature-tags {
+  margin-top: 0;
 }
 
-.aranya__media {
-  will-change: transform;
+.aranya__aside .text-link {
+  margin-top: clamp(28px, 4vw, 40px);
 }
 
 /* Crossfade when a feature tag swaps the photograph (initAranya). */
@@ -56,5 +72,24 @@
 
   .aranya__media .media-fill {
     transition: none;
+  }
+}
+
+@media (max-width: 960px) {
+  .aranya {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'intro'
+      'media'
+      'aside';
+    row-gap: var(--space-8);
+  }
+
+  .aranya__body {
+    margin-left: 0;
+  }
+
+  .aranya__aside .feature-tags {
+    margin-top: 0;
   }
 }
