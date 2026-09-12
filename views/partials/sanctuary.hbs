@@ -11,7 +11,9 @@
       <h2 id="sanctuary-heading" class="section-intro__heading heading-2">
         {{#each sanctuary.headingLines}}{{this}}{{#unless @last}}<br />{{/unless}}{{/each}}
       </h2>
-      <p class="section-intro__body body-text--lg">{{sanctuary.intro}}</p>
+      {{#each sanctuary.introParagraphs}}
+        <p class="section-intro__body body-text--lg">{{this}}</p>
+      {{/each}}
     </div>
 
     <div class="sanctuary-slider__controls">

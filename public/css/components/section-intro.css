@@ -24,3 +24,7 @@
   margin-top: 22px;
   max-width: 60ch;
 }
+
+.section-intro__body + .section-intro__body {
+  margin-top: 16px;
+}

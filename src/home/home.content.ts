@@ -78,7 +78,7 @@ export const homeContent = {
   meta: {
     title: 'Amandaria — Vanya Nadi',
     description:
-      "A private boutique retreat woven into the jungle canopy and wild river landscape of Sri Lanka's Knuckles Mountain Range.",
+      'A private world beyond the map, where the raw poetry of the Knuckles wilderness meets the pinnacle of thoughtful, modern design.',
   },
 
   nav: {
@@ -92,7 +92,7 @@ export const homeContent = {
       { label: 'Architecture & Design', href: '#architecture' },
       { label: 'The Experience', href: '#experience' },
       { label: 'Culinary Journey', href: '#culinary' },
-      { label: 'Private Inquiry', href: '#inquiry' },
+      { label: 'Private Inquiries', href: '#inquiry' },
     ] as NavLink[],
     cta: { label: 'Inquire', href: '#inquiry' } as CtaLink,
     menuLabel: 'Menu',
@@ -126,10 +126,13 @@ export const homeContent = {
 
   brandIntro: {
     eyebrow: 'Our Story',
-    headingLines: ['Beyond the map.', 'Within the canopy.'],
+    headingLines: ['The Genesis:', 'A Return to the Wild.'],
     paragraphs: [
       'Deep in the heart of Sri Lanka, where the misty, ancient peaks of the Knuckles Mountain Range meet the whispering canopy of the jungle, time slows down. Amandaria — Vanya Nadi was born from a desire to create something rare: a sanctuary that honours the untamed majesty of the landscape without ever compromising on refined, barefoot luxury.',
-      'Amandaria evokes a vision of peaceful grace and secluded beauty, while Vanya Nadi — meaning "wild river" — anchors the retreat to the organic, flowing pulse of the surrounding wilderness. Here, architecture does not conquer nature; it converses with it.',
+      'The name itself tells the story of our home. Amandaria evokes a vision of peaceful grace and secluded beauty, while Vanya Nadi — meaning "wild river" — anchors the retreat to the organic, flowing pulse of the surrounding wilderness. Here, architecture does not conquer nature; it converses with it.',
+      'Amandaria — Vanya Nadi is not merely a destination; it is an immersion. It is morning mist rolling over the mountain ridge as the jungle wakes, quiet afternoons suspended in the canopy, and evenings under a vast, starlit Sri Lankan sky.',
+      'Operated as an exclusive, all-inclusive boutique retreat, every detail of your stay is intuitively curated. From the privacy of your secluded villa to the rich culinary expressions that celebrate the soul of the island, we offer a deeply personal brand of hospitality where your time is entirely your own.',
+      'Our Promise: To offer a private world beyond the map, where the raw poetry of the Knuckles wilderness meets the pinnacle of thoughtful, modern design.',
     ],
     imageLandscape: {
       src: '/images/Villa/Villa_bed.webp',
@@ -143,14 +146,16 @@ export const homeContent = {
 
   sanctuary: {
     eyebrow: 'The Philosophy',
-    headingLines: ['A Private World,', 'Woven Into the Wild.'],
-    intro:
+    headingLines: ['Tropical Modernism', '& Absolute Privacy.'],
+    introParagraphs: [
       'We believe true luxury is found in space, silence, and absolute privacy. Our intimate collection of Aranya’s — thoughtfully designed with minimalist jungle aesthetics and inspired by the effortless flow of Tropical Modernism — are woven seamlessly into the forest.',
+      'Every structure, from our elevated river pavilion sanctuaries to our private spaces, is crafted to dissolve the boundary between indoors and out. Floor-to-ceiling vistas frame the dramatic mountain terrain, while natural textures, warm ambient lighting, and bespoke design invite you to exhale deeply and disconnect from the noise of the world.',
+    ],
     items: [
       {
         index: '01',
         title: 'The Canopy',
-        body: 'Elevated rooms that open onto the forest.',
+        body: 'Quiet afternoons suspended in the canopy — a private world woven into the wild.',
         image: {
           src: '/images/Pods/Pods_Exterior_2.webp',
           alt: 'A private pavilion with a circular plunge pool, nested in misty jungle canopy.',
@@ -159,7 +164,7 @@ export const homeContent = {
       {
         index: '02',
         title: 'The River',
-        body: 'Wild river heard before seen, felt after.',
+        body: 'Vanya Nadi — the wild river — anchors every sanctuary to the flowing pulse of the wilderness.',
         image: {
           src: '/images/Villa/Villa_exterior-river-view.webp',
           alt: 'A curved timber villa on a forested hillside at dawn, the wild river winding through the misted valley below.',
@@ -168,7 +173,7 @@ export const homeContent = {
       {
         index: '03',
         title: 'The View',
-        body: 'Vistas dissolve the line between shelter and sky.',
+        body: 'Floor-to-ceiling vistas frame the dramatic mountain terrain of the Knuckles.',
         image: {
           src: '/images/Villa/Villa_bed.webp',
           alt: 'A bedroom opening through floor-to-ceiling glass onto misted forested hills.',
@@ -177,7 +182,7 @@ export const homeContent = {
       {
         index: '04',
         title: 'The Silence',
-        body: 'Stillness and privacy — unhurried, entirely yours.',
+        body: 'Space, silence, and absolute privacy — unhurried stillness, entirely yours.',
         image: {
           src: '/images/Pool-Spa/interior.webp',
           alt: 'The spa’s circular rain shower falling into a still, shadowed pool.',
@@ -190,15 +195,23 @@ export const homeContent = {
     eyebrow: 'The Destination',
     headingLines: ['The Mist-Laden Heart', 'of the Knuckles.'],
     intro:
-      'Bordering the UNESCO World Heritage-listed Knuckles Mountain Range in central Sri Lanka, Amandaria — Vanya Nadi sits entirely apart from the typical coastal or crowded tourist trail. Misty peaks. Ancient forests. Cascading waterfalls. The organic rhythm of a wild river.',
+      'Bordering the UNESCO World Heritage-listed Knuckles Mountain Range in central Sri Lanka, Amandaria — Vanya Nadi sits entirely apart from the typical coastal or crowded tourist trail.',
     tags: [
       {
         label: 'The Landscape',
-        body: 'An untouched theatre of misty peaks, dense cloud forests, cascading waterfalls, and the organic, flowing rhythm of the wild river.',
+        body: 'An untouched theatre of misty peaks, dense cloud forests, cascading waterfalls, and the organic, flowing rhythm of the wild river (Vanya Nadi).',
       },
       {
         label: 'The Atmosphere',
-        body: 'A secluded micro-climate where mornings roll in with a blanket of quiet fog, and the modern world feels millions of miles away.',
+        body: 'A secluded micro-climate where the air is crisp, mornings roll in with a blanket of quiet fog, and the chaos of the modern world feels millions of miles away. It is an environment designed for absolute stillness, deep breath, and total privacy.',
+      },
+      {
+        label: 'Architecture in Dialogue with Nature',
+        body: 'Built on principles of Tropical Modernism and minimalist jungle aesthetics, our structures — ranging from elevated river pavilion sanctuaries (Aranya’s) to sculptural, stump-inspired private villas — dissolve the barrier between inside and out. Architecture does not tame the landscape; it frames it.',
+      },
+      {
+        label: 'An Immersive Pace',
+        body: 'The concept centres on unhurried luxury. Guests trade schedules for the cadence of the wild — private mornings overlooking the canopy, bespoke culinary expressions celebrating contemporary Sri Lankan fusion, and an uncompromised standard of barefoot hospitality.',
       },
     ] as DestinationTag[],
     image: {
@@ -216,7 +229,7 @@ export const homeContent = {
       'The Wild.',
     ],
     statement: 'Architecture does not tame the landscape; it frames it.',
-    body: 'Built on principles of Tropical Modernism and minimalist jungle aesthetics, our structures — ranging from elevated river pavilion sanctuaries to sculptural, stump-inspired private villas — dissolve the barrier between inside and out.',
+    body: 'Built on principles of Tropical Modernism and minimalist jungle aesthetics, our structures — ranging from elevated river pavilion sanctuaries (Aranya’s) to sculptural, stump-inspired private villas — dissolve the barrier between inside and out.',
     materials: [
       {
         key: 'glass',
@@ -269,9 +282,9 @@ export const homeContent = {
 
   aranya: {
     eyebrow: 'The Aranya',
-    heading: 'Aranya',
-    subheading: 'Your sanctuary above the river.',
-    body: 'Inside your river pavilion, clean lines, organic textures, and tropical modernism take centre stage. Floor-to-ceiling glass frames untamed green vistas, blurring the boundary between indoor luxury and the wild river rushing past below. Unwind on oversized daybeds, or soak in a private plunge pool suspended under the open jungle canopy.',
+    heading: 'Minimalist Sanctuary',
+    subheading: 'Architecture that breathes with the wild.',
+    body: 'Inside your river pavilion, clean lines, organic textures, and tropical modernism take centre stage. Floor-to-ceiling glass frames untamed green vistas, blurring the boundary between indoor luxury and the wild river (Vanya Nadi) rushing past below. Unwind on oversized daybeds or soak in a private plunge pool suspended under the open jungle canopy.',
     // Each feature swaps the panel photograph on click — see
     // initAranya (main.js) and [data-aranya-image].
     features: [
@@ -318,14 +331,14 @@ export const homeContent = {
 
   experience: {
     eyebrow: 'The Experience',
-    heading: 'A Day Without a Schedule',
+    heading: 'Untamed, Unrivaled, Uncompromised',
     subheading: 'Let the rhythm of the wild decide the pace.',
     hint: 'Slide to follow the day',
     items: [
       {
         time: '06:00',
         title: 'Awaken in the Canopy',
-        body: 'Mist rolls across the mountains at dawn.',
+        body: 'Wake to the gentle rustle of the mist-laden Knuckles cloud forest. Step onto your private, elevated floating deck as the cool mountain breeze carries the scent of wild pepper and earth.',
         image: {
           src: '/images/Owner-Residence/Bedroom-1.webp',
           alt: 'Morning light in a private bedroom looking out into the forest.',
@@ -333,8 +346,8 @@ export const homeContent = {
       },
       {
         time: '09:00',
-        title: 'Morning Stillness',
-        body: 'Ceylon tea as the valley emerges below.',
+        title: 'The Morning Ritual',
+        body: 'A steaming cup of locally harvested high-grown Ceylon tea awaits, as the valley below slowly emerges from the morning fog.',
         image: {
           src: '/images/Owner-Residence/Terrace.webp',
           alt: 'A private terrace set above the canopy, ready for a quiet morning.',
@@ -342,8 +355,8 @@ export const homeContent = {
       },
       {
         time: '13:00',
-        title: 'Into the Wild',
-        body: 'The landscape at your own unhurried pace.',
+        title: 'Suspended in the Canopy',
+        body: 'Quiet afternoons suspended in the canopy, where the modern world feels millions of miles away.',
         image: {
           src: '/images/Pods/Pods_Exterior_1_dark.webp',
           alt: 'A forest pavilion stepping out into the surrounding jungle.',
@@ -351,8 +364,8 @@ export const homeContent = {
       },
       {
         time: '17:30',
-        title: 'Golden Hour',
-        body: 'Mountains dissolve into mist at golden hour.',
+        title: 'As Day Turns to Dusk',
+        body: 'A culinary journey that redefines tradition — contemporary Sri Lankan fusion under soft evening light.',
         image: {
           src: '/images/Pool-Spa/exterior-1.webp',
           alt: 'The infinity pool terrace looking toward the hills at late light.',
@@ -360,8 +373,8 @@ export const homeContent = {
       },
       {
         time: '20:00',
-        title: 'Under the Stars',
-        body: 'Dining beneath a vast unpolluted night sky.',
+        title: 'Under a Starlit Sky',
+        body: 'Evenings under a vast, unpolluted Sri Lankan night sky — fine wines and the soul of the island.',
         image: {
           src: '/images/Restaurant/Restaurant_Exterior _2-dark.webp',
           alt: 'The dining pavilion at dusk, lit for an evening under the open sky.',
@@ -373,10 +386,15 @@ export const homeContent = {
   culinary: {
     eyebrow: 'Culinary Journey',
     heading: 'Savor the Soul of the Island.',
-    subheading: 'Contemporary Sri Lankan Fusion.',
-    body: 'As day turns to dusk, experience a culinary journey that redefines tradition — where time-honoured spices, hyper-local organic produce, and modern techniques are paired with fine wines, all enjoyed under a blanket of unpolluted starlight.',
+    subheading: 'Elevated Fusion Dining',
+    body: 'As day turns to dusk, experience a culinary journey that redefines tradition. Indulge in contemporary Sri Lankan fusion — where time-honoured spices, hyper-local organic produce, and modern techniques are paired with fine wines, all enjoyed under a blanket of unpolluted starlight.',
     cta: { label: 'Discover the Culinary Journey', href: '#inquiry' } as CtaLink,
-    themes: ['Time-honoured Spices', 'Local Organic Produce', 'Modern Techniques', 'Fine Wines'],
+    themes: [
+      'Time-honoured Spices',
+      'Local Organic Produce',
+      'Modern Techniques',
+      'Fine Wines',
+    ],
     image: {
       src: '/images/Restaurant/CulinaryJourney_2.webp',
       alt: 'A plated dish of seared scallops with local spices and a glass of white wine, set against a mountain sunset.',
@@ -388,14 +406,14 @@ export const homeContent = {
   },
 
   privacy: {
-    eyebrow: 'Absolute Privacy',
-    heading: 'Your time is entirely your own.',
-    body: 'With a strictly limited collection of keys ensuring total seclusion, your stay is defined by complete freedom. No crowded spaces. No rigid itineraries. No unnecessary noise. Just unhurried stillness and intuitive hospitality.',
+    eyebrow: 'Total Sovereignty Over Time',
+    heading: 'Absolute Privacy',
+    body: 'With a strictly limited collection of keys ensuring total seclusion, your stay is defined by complete freedom. There are no crowded spaces, no rigid itineraries — just unhurried stillness, intuitive barefoot hospitality, and a private world that belongs entirely to you.',
   },
 
   finalCta: {
     headingLines: ['Perhaps it is time', 'to disappear.'],
-    body: 'Discover a private world where the ancient mist of the Knuckles meets minimalist architectural poetry.',
+    body: 'Where the ancient mist of the Knuckles meets minimalist architectural poetry. Discover a private world crafted for the few.',
     primaryCta: { label: 'Private Inquiry', href: '#inquiry' } as CtaLink,
     secondaryCta: { label: 'Contact Amandaria', href: 'mailto:info@amandaria.com' } as CtaLink,
     callout: 'Where every moment moves at the unhurried rhythm of the wild.',
@@ -406,7 +424,7 @@ export const homeContent = {
   },
 
   inquiryForm: {
-    eyebrow: 'Private Inquiry',
+    eyebrow: 'Private Inquiries',
     heading: 'Begin a Private Inquiry',
     note: 'A member of the Amandaria team will respond personally within two days. No booking or payment is required at this stage.',
     fields: {
@@ -424,8 +442,8 @@ export const homeContent = {
 
   journeyStatement: {
     headingLines: [
-      { text: 'Where silence' },
-      { text: 'becomes ', emphasis: 'sanctuary.' },
+      { text: 'Beyond the map.' },
+      { text: 'Within the ', emphasis: 'canopy.' },
     ] as StatementLine[],
     cta: { label: 'Begin a Private Inquiry', href: '#inquiry' } as CtaLink,
     image: {
@@ -445,6 +463,7 @@ export const homeContent = {
     brandTagline: 'The Knuckles Mountain Range, Sri Lanka.',
     closingStatement: 'Beyond the map. Within the canopy.',
     email: 'info@amandaria.com',
+    copyrightName: 'Amandaria — Vanya Nadi',
     groups: [
       {
         heading: 'Contact & Inquiries',
@@ -458,7 +477,7 @@ export const homeContent = {
         ],
       },
       {
-        heading: 'Legal',
+        heading: 'Legal & Privacy',
         links: [
           { label: 'Privacy Policy', href: '#footer' },
           { label: 'Terms of Stay', href: '#footer' },
