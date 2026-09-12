@@ -1,15 +1,9 @@
 <section class="section section--light" id="aranya" aria-labelledby="aranya-heading">
   <div class="wrap aranya">
-    <div class="aranya__intro">
-      <span class="eyebrow">{{aranya.eyebrow}}</span>
-      <h2 id="aranya-heading" class="heading-2">{{aranya.heading}}</h2>
-      <div class="aranya__body">
-        <p class="heading-sub">{{aranya.subheading}}</p>
-        <p class="body-text body-text--lg">{{aranya.body}}</p>
-      </div>
-    </div>
-
-    <div class="art-panel art-panel--tall aranya__media" data-aranya-image>
+    <div
+      class="art-panel art-panel--tall aranya__media"
+      data-aranya-image
+    >
       <div class="topo-field topo-field--photo">
         <img
           class="media-fill"
@@ -25,25 +19,36 @@
       </div>
     </div>
 
-    <div class="aranya__aside">
-      <div class="feature-tags">
-        {{#each aranya.features}}
-          <button
-            type="button"
-            class="feature-tags__item"
-            data-image="{{this.image.src}}"
-            data-alt="{{this.image.alt}}"
-            data-caption="{{this.caption}}"
-            aria-pressed="false"
-          >{{this.label}}</button>
-        {{/each}}
+    <div class="aranya__copy">
+      <div class="aranya__intro">
+        <span class="eyebrow">{{aranya.eyebrow}}</span>
+        <h2 id="aranya-heading" class="heading-2">{{aranya.heading}}</h2>
+        <div class="aranya__body">
+          <p class="heading-sub">{{aranya.subheading}}</p>
+          <p class="body-text body-text--lg">{{aranya.body}}</p>
+        </div>
       </div>
-      <a class="text-link" href="{{aranya.cta.href}}">
-        {{aranya.cta.label}}
-        <svg class="btn__icon" viewBox="0 0 13 9" fill="none" aria-hidden="true">
-          <path d="M0 4.5H12M12 4.5L8 0.5M12 4.5L8 8.5" stroke="currentColor" />
-        </svg>
-      </a>
+
+      <div class="aranya__aside">
+        <div class="feature-tags">
+          {{#each aranya.features}}
+            <button
+              type="button"
+              class="feature-tags__item"
+              data-image="{{this.image.src}}"
+              data-alt="{{this.image.alt}}"
+              data-caption="{{this.caption}}"
+              aria-pressed="false"
+            >{{this.label}}</button>
+          {{/each}}
+        </div>
+        <a class="text-link" href="{{aranya.cta.href}}">
+          {{aranya.cta.label}}
+          <svg class="btn__icon" viewBox="0 0 13 9" fill="none" aria-hidden="true">
+            <path d="M0 4.5H12M12 4.5L8 0.5M12 4.5L8 8.5" stroke="currentColor" />
+          </svg>
+        </a>
+      </div>
     </div>
   </div>
 </section>
