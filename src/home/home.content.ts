@@ -38,6 +38,13 @@ export interface AranyaFeature {
   caption: string;
 }
 
+export interface AranyaSlide {
+  index: string;
+  label: string;
+  image: ContentImage;
+  caption: string;
+}
+
 export interface DestinationTag {
   label: string;
   body: string;
@@ -272,8 +279,56 @@ export const homeContent = {
     heading: 'Aranya',
     subheading: 'Your sanctuary above the river.',
     body: 'Inside your river pavilion, clean lines, organic textures, and tropical modernism take centre stage. Floor-to-ceiling glass frames untamed green vistas, blurring the boundary between indoor luxury and the wild river rushing past below. Unwind on oversized daybeds, or soak in a private plunge pool suspended under the open jungle canopy.',
-    // Each feature swaps the panel photograph on click — see
-    // initAranya (main.js) and [data-aranya-image].
+    // Mobile slider items (swipeable carousel on mobile view)
+    slides: [
+      {
+        index: '01',
+        label: 'River Pavilion',
+        image: {
+          src: '/images/Villa/Villa_sunken_lounge.webp',
+          alt: 'A sunken lounge with a wave ceiling, opening onto a mountain balcony.',
+        },
+        caption: 'Aranya · River Pavilion',
+      },
+      {
+        index: '02',
+        label: 'Private Deck',
+        image: {
+          src: '/images/Villa/Villa_upper_deck.webp',
+          alt: 'A curved private deck with loungers beside an infinity-edge plunge pool at sunset.',
+        },
+        caption: 'Aranya · Private Deck',
+      },
+      {
+        index: '03',
+        label: 'River Views',
+        image: {
+          src: '/images/Pods/Pods_Exterior_2_riwer_view.webp',
+          alt: 'A pavilion with a plunge pool overlooking the river winding through the misted valley.',
+        },
+        caption: 'Aranya · River Views',
+      },
+      {
+        index: '04',
+        label: 'Plunge Pool',
+        image: {
+          src: '/images/Pods/Pods_Exterior_2.webp',
+          alt: 'A private pavilion with a circular plunge pool, nested in misty jungle canopy.',
+        },
+        caption: 'Aranya · Plunge Pool',
+      },
+      {
+        index: '05',
+        label: 'Canopy Immersion',
+        image: {
+          src: '/images/Owner-Residence/Terrace.webp',
+          alt: 'A woven-canopy terrace lounge open to the forested mountain view.',
+        },
+        caption: 'Aranya · Canopy Immersion',
+      },
+    ] as AranyaSlide[],
+    // Desktop feature tags swap the panel photograph on click.
+    // Keep to four labels so they sit on one line beside the copy.
     features: [
       {
         label: 'Private Deck',

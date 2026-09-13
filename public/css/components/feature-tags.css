@@ -8,6 +8,7 @@
 .feature-tags {
   display: flex;
   flex-wrap: wrap;
+  row-gap: 10px;
   margin: clamp(28px, 4vw, 44px) 0;
 }
 
@@ -22,8 +23,9 @@
   letter-spacing: var(--tracking-nav);
   text-transform: uppercase;
   color: var(--color-text-muted);
-  padding: 4px 22px;
+  padding: 4px clamp(10px, 1.2vw, 16px);
   line-height: 1.4;
+  white-space: nowrap;
   cursor: pointer;
   transition: color var(--duration-base) var(--ease-editorial);
 }

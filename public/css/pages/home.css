@@ -73,7 +73,9 @@
     color var(--duration-slow) var(--ease-editorial);
 }
 
-/* Anchor targets should land clear of the fixed header. */
+/* Anchor targets land flush at viewport top. A -2px margin ensures subpixel
+   rounding never exposes a sliver of the preceding section. Sections provide
+   their own vertical padding (--section-padding) so content clears the header. */
 #brand,
 #sanctuary,
 #destination,
@@ -85,5 +87,5 @@
 #final-cta,
 #inquiry,
 #footer {
-  scroll-margin-top: var(--header-height);
+  scroll-margin-top: -2px;
 }

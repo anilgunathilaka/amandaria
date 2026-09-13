@@ -4,7 +4,7 @@
  * single indent underneath.
  *
  * Desktop: image | copy (intro + tags + CTA)
- * Mobile:  intro → image → tags + CTA
+ * Mobile:  intro → slider of images → aside (tags + CTA)
  */
 
 .aranya {
@@ -18,6 +18,15 @@
 .aranya__media {
   grid-area: media;
   will-change: transform;
+}
+
+/* Desktop: show single photograph panel, hide mobile slider */
+.aranya__desktop-panel {
+  display: block;
+}
+
+.aranya__slider {
+  display: none;
 }
 
 .aranya__copy {
@@ -48,6 +57,28 @@
 .aranya__aside .text-link {
   display: inline-flex;
   margin-top: clamp(28px, 4vw, 40px);
+}
+
+/* Mid desktop: copy column is narrow — keep tags on one line. */
+@media (max-width: 1440px) and (min-width: 961px) {
+  .aranya {
+    grid-template-columns: minmax(0, 1.05fr) minmax(280px, 1fr);
+    column-gap: clamp(28px, 3.5vw, 56px);
+  }
+
+  .aranya__aside .feature-tags {
+    flex-wrap: nowrap;
+  }
+
+  .aranya__aside .feature-tags__item {
+    padding-inline: 10px;
+    letter-spacing: 0.1em;
+    font-size: 10px;
+  }
+
+  .aranya__aside .feature-tags__item:first-child {
+    padding-left: 0;
+  }
 }
 
 /* Crossfade when a feature tag swaps the photograph (initAranya). */
@@ -92,6 +123,108 @@
 
   .aranya__media {
     grid-area: media;
+    will-change: auto;
+    transform: none;
+  }
+
+  /* Hide desktop single panel, display mobile slider */
+  .aranya__desktop-panel {
+    display: none;
+  }
+
+  .aranya__slider {
+    display: block;
+    width: 100%;
+    position: relative;
+  }
+
+  .aranya__slider-viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    width: 100%;
+    container-type: inline-size;
+  }
+
+  .aranya__slider-viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .aranya__slider-track {
+    display: flex;
+    gap: var(--space-4);
+    width: max-content;
+  }
+
+  .aranya-slide {
+    flex: 0 0 calc(100cqi - 28px);
+    width: calc(100cqi - 28px);
+    scroll-snap-align: start;
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
+  .aranya-slide__count {
+    font-size: var(--text-label);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    color: var(--color-accent);
+  }
+
+  .aranya__slider-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    margin-top: var(--space-5);
+  }
+
+  .aranya__slider-btn {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border: 1px solid currentColor;
+    color: inherit;
+    background: transparent;
+    position: relative;
+    cursor: pointer;
+    transition:
+      border-color var(--duration-base) var(--ease-editorial),
+      background-color var(--duration-base) var(--ease-editorial),
+      color var(--duration-base) var(--ease-editorial),
+      opacity var(--duration-base) var(--ease-editorial);
+  }
+
+  .aranya__slider-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    border-left: 1.5px solid currentColor;
+    border-bottom: 1.5px solid currentColor;
+  }
+
+  .aranya__slider-btn[data-aranya-prev]::before {
+    transform: translate(-30%, -50%) rotate(45deg);
+  }
+
+  .aranya__slider-btn[data-aranya-next]::before {
+    transform: translate(-70%, -50%) rotate(-135deg);
+  }
+
+  .aranya__slider-btn:hover:not(:disabled) {
+    background: currentColor;
+    color: var(--color-on-accent);
+  }
+
+  .aranya__slider-btn:disabled {
+    opacity: 0.28;
+    cursor: default;
   }
 
   .aranya__aside {
@@ -103,6 +236,10 @@
   }
 
   .aranya__aside .feature-tags {
+    display: none;
+  }
+
+  .aranya__aside .text-link {
     margin-top: 0;
   }
 }
