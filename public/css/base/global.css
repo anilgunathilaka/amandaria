@@ -8,6 +8,16 @@
 
 html {
   scroll-behavior: smooth;
+  /* Clip horizontal bleed from 100vw math / transformed layers without
+     breaking position:sticky (unlike overflow-x: hidden on body alone). */
+  overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100%;
+}
+
+/* Lenis owns scroll easing — disable CSS smooth-scroll to avoid fighting it. */
+html.lenis {
+  scroll-behavior: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -25,6 +35,9 @@ body {
   line-height: var(--leading-normal);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 h1,

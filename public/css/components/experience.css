@@ -1,14 +1,16 @@
 /**
  * .experience — screenshot split: copy + chevrons on the left,
  * two full-height portraits on the right.
+ *
+ * Scroll-drive uses a sticky pin inside a taller stage: vertical
+ * page scroll maps to horizontal track travel (same pattern as
+ * Philosophy / .sanctuary). Do not put overflow (other than visible)
+ * on .experience — it breaks position:sticky.
  */
 
 .experience {
-  display: grid;
-  grid-template-columns: minmax(18rem, 0.4fr) minmax(0, 0.6fr);
-  align-items: stretch;
   padding-block: 0;
-  overflow: hidden;
+  /* --experience-pin-top is set by JS so the locked panel centers. */
   --experience-gap: clamp(10px, 1.2vw, 16px);
   --experience-visible: 2;
   --experience-copy-pad-end: clamp(24px, 3vw, 56px);
@@ -22,6 +24,20 @@
   );
   --experience-card-height: 96%;
   --experience-time-row: calc(var(--space-5) + var(--text-sub) * 1.4);
+}
+
+.experience__stage {
+  position: relative;
+  /* Height set in JS = pin height + horizontal-drive runway. */
+}
+
+.experience__pin {
+  position: sticky;
+  top: var(--experience-pin-top, 0px);
+  display: grid;
+  grid-template-columns: minmax(18rem, 0.4fr) minmax(0, 0.6fr);
+  align-items: stretch;
+  width: 100%;
   min-height: calc(
     var(--experience-inner-height) + var(--experience-section-pad) * 2
   );
@@ -158,6 +174,17 @@
   height: 100%;
 }
 
+/* Sticky scroll-drive: native overflow/snap off; track moves via transform. */
+.experience.is-scroll-driven .experience__viewport {
+  overflow-x: hidden;
+  scroll-snap-type: none;
+}
+
+.experience.is-scroll-driven .experience__track {
+  will-change: transform;
+  transition: none;
+}
+
 .experience-card {
   position: relative;
   flex: 0 0
@@ -244,13 +271,24 @@
   .experience__viewport {
     scroll-behavior: auto;
   }
+
+  .experience__stage {
+    height: auto !important;
+  }
+
+  .experience__pin {
+    position: static;
+  }
 }
 
 @media (max-width: 960px) {
   .experience {
+    --experience-visible: 1;
+  }
+
+  .experience__pin {
     grid-template-columns: 1fr;
     min-height: 0;
-    --experience-visible: 1;
   }
 
   .experience__copy {

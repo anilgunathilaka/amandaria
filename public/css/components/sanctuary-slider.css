@@ -2,24 +2,48 @@
  * .sanctuary-slider — Philosophy cards in a horizontal track.
  * Two cards sit fully in view; the third peeks halfway at the
  * right edge of the page. Works with one to four cards.
+ *
+ * Scroll-drive uses a sticky pin inside a taller stage: vertical
+ * page scroll maps to horizontal track travel. Do not put overflow
+ * (other than visible) on .sanctuary — it breaks position:sticky.
  */
 
 .sanctuary {
   transition:
     background-color var(--duration-slow) var(--ease-editorial),
     color var(--duration-slow) var(--ease-editorial);
+  width: 100%;
+  max-width: 100%;
+  /* --sanctuary-pin-extra is set by JS (runway for horizontal drive). */
+  --sanctuary-pin-extra: 0px;
+}
+
+.sanctuary__stage {
+  position: relative;
+  /* Height set in JS = pin height + horizontal-drive runway. */
+}
+
+.sanctuary__pin {
+  position: sticky;
+  /* JS sets --sanctuary-pin-top so the locked panel sits vertically centered. */
+  top: var(--sanctuary-pin-top, 0px);
+  width: 100%;
 }
 
 .sanctuary-slider {
   --sanctuary-gap: clamp(1.25rem, 2.2vw, 2.25rem);
+  /* 100% of .sanctuary (full-bleed section) — avoids 100vw scrollbar overflow. */
   --sanctuary-start: max(
     var(--content-gutter),
-    calc((100vw - var(--content-max-width)) / 2 + var(--content-gutter))
+    calc((100% - var(--content-max-width)) / 2 + var(--content-gutter))
   );
   --sanctuary-card-width: calc(
-    (100vw - var(--sanctuary-start) - (2 * var(--sanctuary-gap))) / 2.5
+    (100% - var(--sanctuary-start) - (2 * var(--sanctuary-gap))) / 2.5
   );
-  margin-top: clamp(48px, 7vw, 88px);
+  margin-top: clamp(28px, 4vw, 56px);
+  overflow-x: clip;
+  width: 100%;
+  max-width: 100%;
 }
 
 .sanctuary-slider__intro {
@@ -33,11 +57,53 @@
   margin-bottom: 0;
 }
 
+/* While the slider is scroll-locked, hide title/subtext without removing
+   them and without collapsing layout (collapse would jump the sticky pin). */
+.sanctuary.is-pin-active .sanctuary-slider__intro .section-intro {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.sanctuary-slider__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-2);
+}
+
 .sanctuary-slider__controls {
   display: flex;
   gap: var(--space-3);
   flex: none;
-  margin-bottom: var(--space-2);
+}
+
+/* Short viewports: tighten vertical rhythm around copy only — image
+   aspect-ratio stays 1 / 1 so card media size is unchanged. */
+@media (max-height: 860px) {
+  .sanctuary-slider__toolbar {
+    margin-bottom: 0;
+  }
+
+  .sanctuary-slider__toolbar .sanctuary-slider__btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .sanctuary-slider {
+    margin-top: clamp(8px, 1.5vh, 20px);
+  }
+
+  .sanctuary-card__label {
+    margin-top: var(--space-3);
+  }
+
+  .sanctuary-card__title {
+    margin-top: var(--space-2);
+  }
+
+  .sanctuary-card__body {
+    margin-top: var(--space-2);
+  }
 }
 
 .sanctuary-slider__btn {
@@ -82,44 +148,8 @@
   cursor: default;
 }
 
-.sanctuary.is-static .sanctuary-slider__controls,
-.sanctuary.is-static .sanctuary-slider__progress {
+.sanctuary.is-static .sanctuary-slider__controls {
   display: none;
-}
-
-.sanctuary-slider__progress {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 0;
-  margin-top: clamp(2rem, 4vw, 3.5rem);
-  padding-left: var(--sanctuary-start);
-  padding-right: var(--content-gutter);
-}
-
-.sanctuary-slider__progress-line {
-  position: relative;
-  width: 5.5rem;
-  height: 2.5rem;
-  padding: 0;
-  flex: none;
-}
-
-.sanctuary-slider__progress-line::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 1px;
-  background: color-mix(in srgb, currentColor 28%, transparent);
-  transform: translateY(-50%);
-}
-
-.sanctuary-slider__progress-line.is-active::before,
-.sanctuary-slider__progress-line:hover::before {
-  height: 1px;
-  background: currentColor;
 }
 
 .sanctuary-slider__viewport {
@@ -142,6 +172,17 @@
   width: max-content;
   padding-left: var(--sanctuary-start);
   padding-right: var(--content-gutter);
+}
+
+/* Sticky scroll-drive: native overflow/snap off; track moves via transform. */
+.sanctuary.is-scroll-driven .sanctuary-slider__viewport {
+  overflow-x: hidden;
+  scroll-snap-type: none;
+}
+
+.sanctuary.is-scroll-driven .sanctuary-slider__track {
+  will-change: transform;
+  transition: none;
 }
 
 .sanctuary-card {
@@ -199,6 +240,14 @@
   .sanctuary-slider__viewport {
     scroll-behavior: auto;
   }
+
+  .sanctuary__stage {
+    height: auto !important;
+  }
+
+  .sanctuary__pin {
+    position: static;
+  }
 }
 
 @media (max-width: 960px) {
@@ -209,7 +258,7 @@
 
   .sanctuary-slider {
     --sanctuary-card-width: calc(
-      (100vw - var(--sanctuary-start) - var(--sanctuary-gap)) / 1.5
+      (100% - var(--sanctuary-start) - var(--sanctuary-gap)) / 1.5
     );
   }
 }

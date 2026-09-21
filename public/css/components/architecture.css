@@ -11,8 +11,9 @@
   --architecture-intro-x: 0px;
   --architecture-intro-y: 0px;
   --architecture-white-x: 0px;
-  --architecture-backdrop-x: 100vw;
-  --architecture-slide-x: 100vw;
+  /* Use % of the pin (not 100vw) so scrollbar gutters never widen the page. */
+  --architecture-backdrop-x: 100%;
+  --architecture-slide-x: 100%;
   --architecture-card-w: clamp(300px, 42vw, 640px);
   --architecture-card-h: clamp(460px, 82svh, 820px);
   --architecture-card-gap: clamp(28px, 4vw, 52px);
@@ -22,7 +23,8 @@
   --architecture-slides-opacity: 1;
   position: relative;
   padding: 0;
-  /* Do not set overflow here — it breaks position:sticky on __pin. */
+  /* Clip sideways travel; clip (not hidden) keeps sticky descendants working. */
+  overflow-x: clip;
   isolation: isolate;
   background: var(--color-surface-light);
 }
@@ -45,10 +47,9 @@
   overflow: hidden;
 }
 
-/* Let the intro travel off-screen during the delayed text slide. */
+/* Keep pin clipped while the intro travels — page-level overflow-x must stay closed. */
 .architecture__pin.is-text-sliding {
-  overflow-x: visible;
-  overflow-y: hidden;
+  overflow: hidden;
 }
 
 .architecture__white-panel {

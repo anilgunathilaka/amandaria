@@ -1,6 +1,7 @@
 /**
  * Amandaria — Vanya Nadi
- * Plain, dependency-free JavaScript. One IIFE, organized by concern:
+ * Plain JavaScript. One IIFE, organized by concern:
+ *   0. Lenis smooth scroll (site-wide glide)
  *   1. Header scroll state
  *   2. Mobile menu
  *   3. Scroll-reveal
@@ -12,13 +13,14 @@
  *   9. Destination parallax
  *  10. Architecture intro reveal + split
  *  11. Aranya scroll theme + image travel
- *  12. Experience hour carousel + copy parallax
+ *  12. Experience hour carousel (sticky scroll-drive)
  *  13. Culinary Journey scroll theme
  *  14. Absolute Privacy hold-and-grow reveal
  *  15. Footer wordmark -> logo lockup (closing reveal)
  *  16. Final CTA: text runs at 200% speed over a static image
  *
- * No framework, no build step — this file is served as-is.
+ * No frontend framework, no JS build step — files in public/ are served as-is.
+ * Lenis is vendored at /js/vendor/lenis.min.js (see package.json "lenis").
  */
 (function () {
   'use strict';
@@ -33,6 +35,7 @@
 
   var scrollCallbacks = [];
   var scrollScheduled = false;
+  var lenis = null;
 
   function runScrollCallbacks() {
     scrollScheduled = false;
@@ -59,6 +62,34 @@
 
   window.addEventListener('scroll', scheduleScroll, { passive: true });
   window.addEventListener('resize', scheduleScroll, { passive: true });
+
+  /* ------------------------------------------------------------------ */
+  /* 0. Lenis — site-wide eased scroll (does not replace section code)    */
+  /* ------------------------------------------------------------------ */
+
+  function initLenis() {
+    if (typeof window.Lenis !== 'function') return;
+
+    // Prefer duration + exponential easing (not lerp) so the glide matches
+    // the studio-freight-style feel the design asks for.
+    lenis = new window.Lenis({
+      duration: 1.5,
+      easing: function (t) {
+        return Math.min(1, 1.001 - Math.pow(2, -10 * t));
+      },
+      smoothWheel: true,
+      autoRaf: true,
+      anchors: true,
+      // Do not use allowNestedScroll — it blocks vertical page scroll when
+      // the cursor sits over horizontal carousels (Philosophy / Experience).
+      // Those tracks use data-lenis-prevent-horizontal instead.
+      respectReducedMotion: true,
+    });
+
+    // Keep every onPageScroll effect in sync while Lenis eases the page.
+    lenis.on('scroll', scheduleScroll);
+    window.__amandariaLenis = lenis;
+  }
 
   /* ------------------------------------------------------------------ */
   /* 1. Header scroll state                                              */
@@ -1184,6 +1215,8 @@
 
   /* ------------------------------------------------------------------ */
   /* 7. Philosophy card slider (+ autoplay)                                */
+  /*     Vertical page scroll is briefly handed to the horizontal track   */
+  /*     while the section is parked in view — layout/spacing untouched.  */
   /* ------------------------------------------------------------------ */
 
   function initSanctuarySlider() {
@@ -1197,7 +1230,22 @@
     var cards = viewport.querySelectorAll('.sanctuary-card');
     if (!track || !cards.length) return;
 
-    var lines = root.querySelectorAll('[data-sanctuary-to]');
+    var stage = root.querySelector('[data-sanctuary-stage]');
+    var pin = root.querySelector('.sanctuary__pin');
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+
+    /* Real position:sticky on .sanctuary__pin (requires #main without
+       overflow). Scroll progress across the stage runway drives the
+       track — no translateY fake-pin (that caused the release jump). */
+    var scrollDriven = !!(stage && pin && !reduceMotion && cards.length > 1);
+    var drivenX = 0;
+    var pinSpan = 1;
+
+    function clamp01(n) {
+      return n < 0 ? 0 : n > 1 ? 1 : n;
+    }
 
     function step() {
       var card = cards[0];
@@ -1206,52 +1254,37 @@
       return card.getBoundingClientRect().width + gap;
     }
 
+    function maxTravel() {
+      return Math.max(0, track.scrollWidth - viewport.clientWidth);
+    }
+
     function maxScroll() {
-      return Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+      return scrollDriven
+        ? maxTravel()
+        : Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    }
+
+    function positionX() {
+      return scrollDriven ? drivenX : viewport.scrollLeft;
     }
 
     function currentIndex() {
       var size = step();
       if (size <= 0) return 0;
-      var index = Math.round(viewport.scrollLeft / size);
+      var index = Math.round(positionX() / size);
       if (index < 0) return 0;
       if (index > cards.length - 1) return cards.length - 1;
       return index;
     }
 
-    function goTo(index) {
-      var left = index * step();
-      var max = maxScroll();
-      if (left > max) left = max;
-      if (left < 0) left = 0;
-      viewport.scrollTo({
-        left: left,
-        behavior: 'smooth',
-      });
-    }
-
     function sync() {
       var max = maxScroll();
-      var atStart = viewport.scrollLeft <= 2;
-      var atEnd = viewport.scrollLeft >= max - 2;
+      var x = positionX();
+      var atStart = x <= 2;
+      var atEnd = x >= max - 2;
       root.classList.toggle('is-static', max <= 2);
       if (prev) prev.disabled = atStart;
       if (next) next.disabled = atEnd;
-
-      var active = currentIndex();
-      for (var i = 0; i < lines.length; i += 1) {
-        var on = i === active;
-        lines[i].classList.toggle('is-active', on);
-        if (on) {
-          lines[i].setAttribute('aria-current', 'true');
-        } else {
-          lines[i].removeAttribute('aria-current');
-        }
-      }
-    }
-
-    function go(direction) {
-      goTo(currentIndex() + direction);
     }
 
     function syncTheme() {
@@ -1260,17 +1293,139 @@
       root.classList.toggle('section--alt', dark);
     }
 
+    function pageY() {
+      return lenis ? lenis.scroll : window.pageYOffset;
+    }
+
+    function measurePin() {
+      if (!scrollDriven) {
+        stage.style.height = '';
+        root.style.removeProperty('--sanctuary-pin-top');
+        root.classList.remove('is-scroll-driven');
+        track.style.transform = '';
+        drivenX = 0;
+        return;
+      }
+      // Clear any leftover fake-pin transform from older builds.
+      pin.style.transform = '';
+
+      // 1 viewport per card step (was 2) → 200% horizontal drive speed.
+      var viewH = window.innerHeight || 1;
+      var extra = Math.max(cards.length - 1, 1) * viewH;
+      stage.style.height = 'auto';
+      var pinH = pin.offsetHeight || viewH;
+      pinSpan = Math.max(extra, 1);
+      stage.style.height = pinH + pinSpan + 'px';
+
+      // Center the panel in the viewport (negative top when pin is taller
+      // than the viewport — sticky supports that).
+      var top = (viewH - pinH) / 2;
+      root.style.setProperty('--sanctuary-pin-top', top.toFixed(1) + 'px');
+    }
+
+    function pinCenterOffset() {
+      var viewH = window.innerHeight || 1;
+      var pinH = pin.offsetHeight || viewH;
+      return (viewH - pinH) / 2;
+    }
+
+    function pinProgress() {
+      if (!scrollDriven) return 0;
+      var pinH = pin.offsetHeight || 1;
+      var span = Math.max(stage.offsetHeight - pinH, 1);
+      pinSpan = span;
+      // Sticky engages when stage top reaches the centered offset.
+      var offset = pinCenterOffset();
+      return clamp01((offset - stage.getBoundingClientRect().top) / span);
+    }
+
+    function applyScrollDrive() {
+      if (!scrollDriven) return;
+
+      var max = maxTravel();
+      if (max <= 2) {
+        root.classList.remove('is-scroll-driven');
+        root.classList.remove('is-pin-active');
+        track.style.transform = '';
+        drivenX = 0;
+        return;
+      }
+
+      root.classList.add('is-scroll-driven');
+
+      var progress = pinProgress();
+      var offset = pinCenterOffset();
+      var top = stage.getBoundingClientRect().top;
+      var pinH = pin.offsetHeight || 1;
+      var span = Math.max(stage.offsetHeight - pinH, 1);
+      // Hide title/subtext for the whole sticky lock range (inclusive edges).
+      var pinActive = top <= offset + 8 && top >= offset - span - 8;
+      root.classList.toggle('is-pin-active', pinActive);
+
+      var nextX = progress * max;
+
+      // Only write when it changes enough — avoids subpixel thrash/jumps.
+      if (Math.abs(nextX - drivenX) > 0.05) {
+        drivenX = nextX;
+        track.style.transform =
+          'translate3d(' + (-drivenX).toFixed(2) + 'px,0,0)';
+      }
+
+      if (viewport.scrollLeft !== 0) viewport.scrollLeft = 0;
+    }
+
+    function goTo(index) {
+      if (index < 0) index = 0;
+      if (index > cards.length - 1) index = cards.length - 1;
+
+      var left = Math.min(index * step(), maxScroll());
+      if (left < 0) left = 0;
+
+      if (!scrollDriven) {
+        viewport.scrollTo({
+          left: left,
+          behavior: reduceMotion ? 'auto' : 'smooth',
+        });
+        return;
+      }
+
+      var max = maxTravel();
+      var progress = max > 0 ? left / max : 0;
+      var pinH = pin.offsetHeight || 1;
+      var span = Math.max(stage.offsetHeight - pinH, 1);
+      var stageTop = stage.getBoundingClientRect().top + pageY();
+      var targetY = stageTop - pinCenterOffset() + progress * span;
+
+      if (lenis) {
+        lenis.scrollTo(targetY, {
+          duration: reduceMotion ? 0 : 1.2,
+          immediate: reduceMotion,
+        });
+      } else {
+        window.scrollTo({
+          top: targetY,
+          behavior: reduceMotion ? 'auto' : 'smooth',
+        });
+      }
+    }
+
+    function go(direction) {
+      goTo(currentIndex() + direction);
+    }
+
     function onWindow() {
+      applyScrollDrive();
       sync();
       syncTheme();
     }
 
+    function onResize() {
+      measurePin();
+      applyScrollDrive();
+      sync();
+    }
+
     /* -- autoplay ---------------------------------------------------- */
-    /* Opt-in via data-sanctuary-autoplay (ms, or "off"); defaults to
-       6000. Advances one card every interval and loops. Suppressed while
-       the section is off-screen, while the pointer/focus is inside it,
-       for a spell after any manual navigation or swipe, and entirely
-       under prefers-reduced-motion. */
     var apAttr = (root.getAttribute('data-sanctuary-autoplay') || '')
       .trim()
       .toLowerCase();
@@ -1278,10 +1433,7 @@
       apAttr === 'off' || apAttr === '0' || apAttr === 'false'
         ? 0
         : parseInt(apAttr, 10) || 1000;
-    var apAllowed =
-      apMs > 0 &&
-      !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
-      cards.length > 1;
+    var apAllowed = apMs > 0 && !reduceMotion && cards.length > 1;
     var apInView = false;
     var apHold = false;
     var apNudgedAt = 0;
@@ -1289,10 +1441,16 @@
     var apResumeAfter = Math.max(apMs * 2, 10000);
 
     function apCanRun() {
+      // Never autoplay while the sticky runway is active — scroll owns it.
+      var inRunway =
+        scrollDriven &&
+        stage.getBoundingClientRect().top < window.innerHeight * 0.5 &&
+        stage.getBoundingClientRect().bottom > window.innerHeight * 0.5;
       return (
         apAllowed &&
         apInView &&
         !apHold &&
+        !inRunway &&
         Date.now() - apNudgedAt >= apResumeAfter &&
         maxScroll() > 2
       );
@@ -1300,10 +1458,7 @@
 
     function apTick() {
       if (apCanRun()) {
-        // Loop when the track can't scroll any further (the last "page"
-        // shows more than one card, so currentIndex() tops out before
-        // cards.length - 1 — key off scroll position, like sync()).
-        var atEnd = viewport.scrollLeft >= maxScroll() - 2;
+        var atEnd = positionX() >= maxScroll() - 2;
         goTo(atEnd ? 0 : currentIndex() + 1);
       }
       apTimer = window.setTimeout(apTick, apMs);
@@ -1335,18 +1490,33 @@
       });
     }
 
-    for (var i = 0; i < lines.length; i += 1) {
-      lines[i].addEventListener('click', function () {
-        apNudge();
-        var to = parseInt(this.getAttribute('data-sanctuary-to') || '0', 10);
-        goTo(to);
-      });
+    if (!scrollDriven) {
+      viewport.addEventListener('scroll', sync, { passive: true });
     }
-
-    viewport.addEventListener('scroll', sync, { passive: true });
     onPageScroll(onWindow);
+    window.addEventListener('resize', onResize, { passive: true });
+
+    measurePin();
+    applyScrollDrive();
     sync();
     syncTheme();
+
+    // Images loading can change pin height mid-session — remeasure once.
+    var imgs = root.querySelectorAll('img');
+    var pending = 0;
+    for (var ii = 0; ii < imgs.length; ii += 1) {
+      if (!imgs[ii].complete) {
+        pending += 1;
+        imgs[ii].addEventListener(
+          'load',
+          function () {
+            pending -= 1;
+            if (pending <= 0) onResize();
+          },
+          { once: true },
+        );
+      }
+    }
 
     if (apAllowed) {
       if ('IntersectionObserver' in window) {
@@ -1356,7 +1526,7 @@
             if (apInView) apStart();
             else apStop();
           },
-          { threshold: 0.4 },
+          { threshold: 0.25 },
         ).observe(root);
       } else {
         apInView = true;
@@ -1375,12 +1545,11 @@
         apHold = false;
       });
       viewport.addEventListener('pointerdown', apNudge);
-      viewport.addEventListener('wheel', apNudge, { passive: true });
     }
   }
 
   /* ------------------------------------------------------------------ */
-  /* 12. Experience hour carousel                                          */
+  /* 12. Experience hour carousel (sticky scroll-drive like Philosophy)   */
   /* ------------------------------------------------------------------ */
 
   function initExperienceSlider() {
@@ -1394,11 +1563,21 @@
     var cards = viewport.querySelectorAll('.experience-card');
     if (!track || !cards.length) return;
 
+    var stage = root.querySelector('[data-experience-stage]');
+    var pin = root.querySelector('.experience__pin');
     var reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
-    var timer = 0;
-    var interval = 4500;
+
+    /* Same sticky runway pattern as sanctuary: page scroll across the
+       stage maps to horizontal track travel; sticky releases when done. */
+    var scrollDriven = !!(stage && pin && !reduceMotion && cards.length > 1);
+    var drivenX = 0;
+    var pinSpan = 1;
+
+    function clamp01(n) {
+      return n < 0 ? 0 : n > 1 ? 1 : n;
+    }
 
     function step() {
       var card = cards[0];
@@ -1407,8 +1586,18 @@
       return card.getBoundingClientRect().width + gap;
     }
 
+    function maxTravel() {
+      return Math.max(0, track.scrollWidth - viewport.clientWidth);
+    }
+
     function maxScroll() {
-      return Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+      return scrollDriven
+        ? maxTravel()
+        : Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+    }
+
+    function positionX() {
+      return scrollDriven ? drivenX : viewport.scrollLeft;
     }
 
     function lastStart() {
@@ -1420,86 +1609,273 @@
     function currentIndex() {
       var size = step();
       if (size <= 0) return 0;
-      var index = Math.round(viewport.scrollLeft / size);
+      var index = Math.round(positionX() / size);
       var last = lastStart();
       if (index < 0) return 0;
       if (index > last) return last;
       return index;
     }
 
+    function sync() {
+      var max = maxScroll();
+      var x = positionX();
+      var atStart = x <= 2;
+      var atEnd = x >= max - 2;
+      root.classList.toggle('is-static', max <= 2);
+      if (prev) prev.disabled = atStart;
+      if (next) next.disabled = atEnd;
+    }
+
+    function pageY() {
+      return lenis ? lenis.scroll : window.pageYOffset;
+    }
+
+    function measurePin() {
+      if (!scrollDriven) {
+        stage.style.height = '';
+        root.style.removeProperty('--experience-pin-top');
+        root.classList.remove('is-scroll-driven');
+        track.style.transform = '';
+        drivenX = 0;
+        return;
+      }
+      pin.style.transform = '';
+
+      // Match Philosophy runway speed (~1.43 viewports per card step).
+      var viewH = window.innerHeight || 1;
+      var extra = Math.max(cards.length - 1, 1) * viewH * (2 / 1.4);
+      stage.style.height = 'auto';
+      var pinH = pin.offsetHeight || viewH;
+      pinSpan = Math.max(extra, 1);
+      stage.style.height = pinH + pinSpan + 'px';
+
+      var top = (viewH - pinH) / 2;
+      root.style.setProperty('--experience-pin-top', top.toFixed(1) + 'px');
+    }
+
+    function pinCenterOffset() {
+      var viewH = window.innerHeight || 1;
+      var pinH = pin.offsetHeight || viewH;
+      return (viewH - pinH) / 2;
+    }
+
+    function pinProgress() {
+      if (!scrollDriven) return 0;
+      var pinH = pin.offsetHeight || 1;
+      var span = Math.max(stage.offsetHeight - pinH, 1);
+      pinSpan = span;
+      var offset = pinCenterOffset();
+      return clamp01((offset - stage.getBoundingClientRect().top) / span);
+    }
+
+    function applyScrollDrive() {
+      if (!scrollDriven) return;
+
+      var max = maxTravel();
+      if (max <= 2) {
+        root.classList.remove('is-scroll-driven');
+        root.classList.remove('is-pin-active');
+        track.style.transform = '';
+        drivenX = 0;
+        return;
+      }
+
+      root.classList.add('is-scroll-driven');
+
+      var progress = pinProgress();
+      var offset = pinCenterOffset();
+      var top = stage.getBoundingClientRect().top;
+      var pinH = pin.offsetHeight || 1;
+      var span = Math.max(stage.offsetHeight - pinH, 1);
+      var pinActive = top <= offset + 8 && top >= offset - span - 8;
+      root.classList.toggle('is-pin-active', pinActive);
+
+      var nextX = progress * max;
+      if (Math.abs(nextX - drivenX) > 0.05) {
+        drivenX = nextX;
+        track.style.transform =
+          'translate3d(' + (-drivenX).toFixed(2) + 'px,0,0)';
+      }
+
+      if (viewport.scrollLeft !== 0) viewport.scrollLeft = 0;
+    }
+
     function goTo(index) {
       var last = lastStart();
-      if (index > last) index = 0;
-      if (index < 0) index = last;
-      var left = index * step();
-      var max = maxScroll();
-      if (left > max) left = max;
+      if (index < 0) index = 0;
+      if (index > last) index = last;
+
+      var left = Math.min(index * step(), maxScroll());
       if (left < 0) left = 0;
-      viewport.scrollTo({
-        left: left,
-        behavior: reduceMotion ? 'auto' : 'smooth',
-      });
+
+      if (!scrollDriven) {
+        viewport.scrollTo({
+          left: left,
+          behavior: reduceMotion ? 'auto' : 'smooth',
+        });
+        return;
+      }
+
+      var max = maxTravel();
+      var progress = max > 0 ? left / max : 0;
+      var pinH = pin.offsetHeight || 1;
+      var span = Math.max(stage.offsetHeight - pinH, 1);
+      var stageTop = stage.getBoundingClientRect().top + pageY();
+      var targetY = stageTop - pinCenterOffset() + progress * span;
+
+      if (lenis) {
+        lenis.scrollTo(targetY, {
+          duration: reduceMotion ? 0 : 1.2,
+          immediate: reduceMotion,
+        });
+      } else {
+        window.scrollTo({
+          top: targetY,
+          behavior: reduceMotion ? 'auto' : 'smooth',
+        });
+      }
     }
 
     function go(direction) {
       goTo(currentIndex() + direction);
     }
 
-    function stop() {
-      window.clearInterval(timer);
-      timer = 0;
+    function onWindow() {
+      applyScrollDrive();
+      sync();
     }
 
-    function play() {
-      stop();
-      if (reduceMotion || cards.length < 2) return;
-      timer = window.setInterval(function () {
-        go(1);
-      }, interval);
+    function onResize() {
+      measurePin();
+      applyScrollDrive();
+      sync();
     }
 
-    function sync() {
-      root.classList.toggle('is-static', maxScroll() <= 2);
+    /* -- autoplay (off while sticky runway owns the slider) ------------ */
+    var apMs = 4500;
+    var apAllowed = !reduceMotion && cards.length > 1;
+    var apInView = false;
+    var apHold = false;
+    var apNudgedAt = 0;
+    var apTimer = null;
+    var apResumeAfter = Math.max(apMs * 2, 10000);
+
+    function apCanRun() {
+      var inRunway =
+        scrollDriven &&
+        stage.getBoundingClientRect().top < window.innerHeight * 0.5 &&
+        stage.getBoundingClientRect().bottom > window.innerHeight * 0.5;
+      return (
+        apAllowed &&
+        apInView &&
+        !apHold &&
+        !inRunway &&
+        Date.now() - apNudgedAt >= apResumeAfter &&
+        maxScroll() > 2
+      );
+    }
+
+    function apTick() {
+      if (apCanRun()) {
+        var atEnd = positionX() >= maxScroll() - 2;
+        goTo(atEnd ? 0 : currentIndex() + 1);
+      }
+      apTimer = window.setTimeout(apTick, apMs);
+    }
+
+    function apStart() {
+      if (apAllowed && !apTimer) apTimer = window.setTimeout(apTick, apMs);
+    }
+
+    function apStop() {
+      window.clearTimeout(apTimer);
+      apTimer = null;
+    }
+
+    function apNudge() {
+      apNudgedAt = Date.now();
     }
 
     if (prev) {
       prev.addEventListener('click', function () {
+        apNudge();
         go(-1);
-        play();
       });
     }
     if (next) {
       next.addEventListener('click', function () {
+        apNudge();
         go(1);
-        play();
       });
     }
 
-    root.addEventListener('mouseenter', stop);
-    root.addEventListener('mouseleave', play);
-    root.addEventListener('focusin', stop);
-    root.addEventListener('focusout', function (event) {
-      if (!root.contains(event.relatedTarget)) play();
-    });
-    document.addEventListener('visibilitychange', function () {
-      if (document.hidden) stop();
-      else play();
-    });
+    if (!scrollDriven) {
+      viewport.addEventListener('scroll', sync, { passive: true });
+    }
+    onPageScroll(onWindow);
+    window.addEventListener('resize', onResize, { passive: true });
 
-    viewport.addEventListener('scroll', sync, { passive: true });
-    window.addEventListener('resize', sync);
+    measurePin();
+    applyScrollDrive();
     sync();
-    play();
+
+    var imgs = root.querySelectorAll('img');
+    var pending = 0;
+    for (var ii = 0; ii < imgs.length; ii += 1) {
+      if (!imgs[ii].complete) {
+        pending += 1;
+        imgs[ii].addEventListener(
+          'load',
+          function () {
+            pending -= 1;
+            if (pending <= 0) onResize();
+          },
+          { once: true },
+        );
+      }
+    }
+
+    if (apAllowed) {
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(
+          function (entries) {
+            apInView = entries[0].isIntersecting;
+            if (apInView) apStart();
+            else apStop();
+          },
+          { threshold: 0.25 },
+        ).observe(root);
+      } else {
+        apInView = true;
+        apStart();
+      }
+      root.addEventListener('mouseenter', function () {
+        apHold = true;
+      });
+      root.addEventListener('mouseleave', function () {
+        apHold = false;
+      });
+      root.addEventListener('focusin', function () {
+        apHold = true;
+      });
+      root.addEventListener('focusout', function () {
+        apHold = false;
+      });
+      viewport.addEventListener('pointerdown', apNudge);
+    }
   }
 
   /* ------------------------------------------------------------------ */
-  /* 13. Experience copy: 200% scroll speed vs the photos                 */
+  /* 13. Experience copy parallax (skipped when sticky scroll-drive)      */
   /* ------------------------------------------------------------------ */
 
   function initExperienceParallax() {
     var section = document.getElementById('experience');
     var copy = section && section.querySelector('[data-experience-copy]');
     if (!section || !copy) return;
+
+    // Sticky scroll-drive owns vertical motion — don't fight it.
+    if (section.querySelector('[data-experience-stage]')) return;
 
     var reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
@@ -1754,6 +2130,7 @@
   }
 
   function init() {
+    safeInit('initLenis', initLenis);
     safeInit('initHeaderScroll', initHeaderScroll);
     safeInit('initMobileMenu', initMobileMenu);
     safeInit('initScrollReveal', initScrollReveal);

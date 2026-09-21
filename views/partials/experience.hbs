@@ -4,50 +4,54 @@
   aria-labelledby="experience-heading"
   data-experience-slider
 >
-  <div class="experience__copy" data-experience-copy>
-    <span class="eyebrow">{{experience.eyebrow}}</span>
-    <h2 id="experience-heading" class="heading-2">{{experience.heading}}</h2>
-    <div class="experience__body">
-      <p class="heading-sub">{{experience.subheading}}</p>
-      <p class="label-sm experience__hint">{{experience.hint}}</p>
-      <div class="experience__controls">
-        <button
-          class="experience__btn"
-          type="button"
-          data-experience-prev
-          aria-label="Previous"
-        ></button>
-        <button
-          class="experience__btn"
-          type="button"
-          data-experience-next
-          aria-label="Next"
-        ></button>
+  <div class="experience__stage" data-experience-stage>
+    <div class="experience__pin">
+      <div class="experience__copy" data-experience-copy>
+        <span class="eyebrow">{{experience.eyebrow}}</span>
+        <h2 id="experience-heading" class="heading-2">{{experience.heading}}</h2>
+        <div class="experience__body">
+          <p class="heading-sub">{{experience.subheading}}</p>
+          <p class="label-sm experience__hint">{{experience.hint}}</p>
+          <div class="experience__controls">
+            <button
+              class="experience__btn"
+              type="button"
+              data-experience-prev
+              aria-label="Previous"
+            ></button>
+            <button
+              class="experience__btn"
+              type="button"
+              data-experience-next
+              aria-label="Next"
+            ></button>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <div class="experience__slider">
-    <div class="experience__viewport" data-experience-viewport>
-      <div class="experience__track">
-        {{#each experience.items}}
-          <article class="experience-card">
-            <div class="experience-card__media">
-              <img
-                class="media-fill"
-                src="{{this.image.src}}"
-                alt="{{this.image.alt}}"
-                loading="lazy"
-                decoding="async"
-              />
-              <div class="experience-card__caption">
-                <h3 class="experience-card__title">{{this.title}}</h3>
-                <p class="experience-card__body">{{this.body}}</p>
-              </div>
-            </div>
-            <span class="experience-card__time">{{this.time}}</span>
-          </article>
-        {{/each}}
+      <div class="experience__slider">
+        <div class="experience__viewport" data-experience-viewport data-lenis-prevent-horizontal>
+          <div class="experience__track">
+            {{#each experience.items}}
+              <article class="experience-card">
+                <div class="experience-card__media">
+                  <img
+                    class="media-fill"
+                    src="{{this.image.src}}"
+                    alt="{{this.image.alt}}"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <div class="experience-card__caption">
+                    <h3 class="experience-card__title">{{this.title}}</h3>
+                    <p class="experience-card__body">{{this.body}}</p>
+                  </div>
+                </div>
+                <span class="experience-card__time">{{this.time}}</span>
+              </article>
+            {{/each}}
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -54,6 +54,10 @@
   position: relative;
   z-index: 4;
   background-color: var(--color-surface);
+  /* No overflow-x here — it breaks position:sticky on Philosophy.
+     Horizontal bleed is clipped on html/body instead. */
+  width: 100%;
+  max-width: 100%;
 }
 
 .site-footer {

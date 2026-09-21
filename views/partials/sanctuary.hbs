@@ -5,6 +5,8 @@
   data-sanctuary-slider
   data-sanctuary-autoplay="6000"
 >
+  {{! Intro stays in the section but outside the sticky pin so title/subtext
+      scroll away while the slider locks — content is not removed. }}
   <div class="wrap sanctuary-slider__intro">
     <div class="section-intro">
       <span class="eyebrow">{{sanctuary.eyebrow}}</span>
@@ -13,54 +15,49 @@
       </h2>
       <p class="section-intro__body body-text--lg">{{sanctuary.intro}}</p>
     </div>
-
-    <div class="sanctuary-slider__controls">
-      <button
-        class="sanctuary-slider__btn"
-        type="button"
-        data-sanctuary-prev
-        aria-label="Previous"
-      ></button>
-      <button
-        class="sanctuary-slider__btn"
-        type="button"
-        data-sanctuary-next
-        aria-label="Next"
-      ></button>
-    </div>
   </div>
 
-  <div class="sanctuary-slider">
-    <div class="sanctuary-slider__viewport" data-sanctuary-viewport>
-      <div class="sanctuary-slider__track">
-        {{#each sanctuary.items}}
-          <article class="sanctuary-card">
-            <div class="sanctuary-card__media">
-              <img
-                class="media-fill"
-                src="{{this.image.src}}"
-                alt="{{this.image.alt}}"
-                loading="lazy"
-                decoding="async"
-              />
-            </div>
-            <span class="sanctuary-card__label">{{this.index}}</span>
-            <h3 class="sanctuary-card__title">{{this.title}}</h3>
-            <p class="sanctuary-card__body body-text">{{this.body}}</p>
-          </article>
-        {{/each}}
+  <div class="sanctuary__stage" data-sanctuary-stage>
+    <div class="sanctuary__pin">
+      <div class="wrap sanctuary-slider__toolbar">
+        <div class="sanctuary-slider__controls">
+          <button
+            class="sanctuary-slider__btn"
+            type="button"
+            data-sanctuary-prev
+            aria-label="Previous"
+          ></button>
+          <button
+            class="sanctuary-slider__btn"
+            type="button"
+            data-sanctuary-next
+            aria-label="Next"
+          ></button>
+        </div>
       </div>
-    </div>
 
-    <div class="sanctuary-slider__progress" data-sanctuary-progress>
-      {{#each sanctuary.items}}
-        <button
-          class="sanctuary-slider__progress-line"
-          type="button"
-          data-sanctuary-to="{{@index}}"
-          aria-label="Go to {{this.title}}"
-        ></button>
-      {{/each}}
+      <div class="sanctuary-slider">
+        <div class="sanctuary-slider__viewport" data-sanctuary-viewport data-lenis-prevent-horizontal>
+          <div class="sanctuary-slider__track">
+            {{#each sanctuary.items}}
+              <article class="sanctuary-card">
+                <div class="sanctuary-card__media">
+                  <img
+                    class="media-fill"
+                    src="{{this.image.src}}"
+                    alt="{{this.image.alt}}"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+                <span class="sanctuary-card__label">{{this.index}}</span>
+                <h3 class="sanctuary-card__title">{{this.title}}</h3>
+                <p class="sanctuary-card__body body-text">{{this.body}}</p>
+              </article>
+            {{/each}}
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
