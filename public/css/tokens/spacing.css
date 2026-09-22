@@ -26,6 +26,8 @@
   --content-gutter: clamp(24px, 5vw, 88px);
   --header-height: 72px;
   --header-logo-icon: 54px;
+  /* Shared left/right header chrome width (fits INQUIRE btn--small). */
+  --header-side-slot: 7rem;
   --hero-logo-icon: clamp(3.2rem, 5vw, 4.4rem);
   --hero-logo-text: clamp(10.5rem, 17vw, 15.5rem);
 

@@ -13,7 +13,10 @@
   height: var(--header-height);
   padding-inline: var(--content-gutter);
   display: grid;
-  grid-template-columns: 1fr auto 1fr;
+  grid-template-columns:
+    minmax(var(--header-side-slot), 1fr)
+    auto
+    minmax(var(--header-side-slot), 1fr);
   align-items: center;
   background: transparent;
 }
@@ -24,6 +27,9 @@
   align-items: center;
   min-height: 1.2em;
   justify-self: start;
+  width: var(--header-side-slot);
+  min-width: var(--header-side-slot);
+  box-sizing: border-box;
 }
 
 .primary-nav {
@@ -110,6 +116,9 @@
   justify-content: flex-end;
   gap: 18px;
   justify-self: end;
+  width: var(--header-side-slot);
+  min-width: var(--header-side-slot);
+  box-sizing: border-box;
 }
 
 .menu-toggle {
