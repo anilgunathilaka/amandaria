@@ -38,6 +38,57 @@
   var scrollScheduled = false;
   var lenis = null;
 
+  /* Mobile horizontal carousels: keep vertical page scroll free.
+     touch-action: pan-y (CSS) lets the page take vertical gestures;
+     this helper only claims clearly horizontal swipes. */
+  function bindMobileCarouselTouch(viewport, onNudge) {
+    if (!viewport) return;
+
+    var mobileMq = window.matchMedia('(max-width: 960px)');
+    var startX = 0;
+    var startY = 0;
+    var lastX = 0;
+    var axis = null;
+
+    viewport.addEventListener(
+      'touchstart',
+      function (event) {
+        if (!mobileMq.matches || event.touches.length !== 1) return;
+        startX = lastX = event.touches[0].clientX;
+        startY = event.touches[0].clientY;
+        axis = null;
+      },
+      { passive: true },
+    );
+
+    viewport.addEventListener(
+      'touchmove',
+      function (event) {
+        if (!mobileMq.matches || event.touches.length !== 1) return;
+        if (axis === 'v') return;
+
+        var x = event.touches[0].clientX;
+        var y = event.touches[0].clientY;
+        var dx = x - startX;
+        var dy = y - startY;
+
+        if (axis === null) {
+          if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+          axis = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+          if (axis === 'v') return;
+          if (typeof onNudge === 'function') onNudge();
+        }
+
+        if (axis === 'h' && event.cancelable) {
+          event.preventDefault();
+          viewport.scrollLeft -= x - lastX;
+          lastX = x;
+        }
+      },
+      { passive: false },
+    );
+  }
+
   function runScrollCallbacks() {
     scrollScheduled = false;
     for (var i = 0; i < scrollCallbacks.length; i += 1) {
@@ -108,6 +159,9 @@
     var reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
+    var mobileBarMq = window.matchMedia('(max-width: 720px)');
+    var mainEl = document.getElementById('main');
+    var surfaceBands = null;
 
     function easeOut(t) {
       return 1 - Math.pow(1 - t, 3);
@@ -121,6 +175,74 @@
 
     function measure() {
       headerH = header.offsetHeight || 72;
+      surfaceBands = document.querySelectorAll('#main > [id], #footer');
+    }
+
+    function isTransparentBg(value) {
+      if (!value || value === 'transparent') return true;
+      var parts = value.match(/[\d.]+/g);
+      if (!parts || parts.length < 3) return true;
+      if (parts.length >= 4 && parseFloat(parts[3]) === 0) return true;
+      return false;
+    }
+
+    function opaqueBackground(el) {
+      var node = el;
+      while (node && node !== document.documentElement) {
+        var bg = window.getComputedStyle(node).backgroundColor;
+        if (!isTransparentBg(bg)) return bg;
+        node = node.parentElement;
+      }
+      return '';
+    }
+
+    function sectionUnderHeader() {
+      if (!surfaceBands || !surfaceBands.length) measure();
+      var probe = Math.max(headerH * 0.5, 1);
+      var i;
+      for (i = 0; i < surfaceBands.length; i += 1) {
+        var rect = surfaceBands[i].getBoundingClientRect();
+        if (rect.top <= probe && rect.bottom > probe) {
+          return surfaceBands[i];
+        }
+      }
+      return null;
+    }
+
+    function syncMobileHeaderSurface(onLight) {
+      if (!mobileBarMq.matches) {
+        if (lastHeaderSurface) {
+          lastHeaderSurface = '';
+          header.style.removeProperty('--header-surface');
+        }
+        return;
+      }
+
+      var under = sectionUnderHeader();
+      var bg = '';
+
+      // Architecture photo phase keeps a light CSS background while the
+      // viewport is filled with imagery — use the dark surface so chrome
+      // stays readable (matches is-on-light being off).
+      if (
+        under &&
+        under.classList.contains('architecture') &&
+        under.classList.contains('is-photo') &&
+        !onLight
+      ) {
+        bg = opaqueBackground(mainEl) || opaqueBackground(document.body);
+      } else if (under) {
+        bg = opaqueBackground(under);
+      }
+
+      if (!bg) {
+        bg = opaqueBackground(mainEl) || opaqueBackground(document.body);
+      }
+
+      if (bg && bg !== lastHeaderSurface) {
+        lastHeaderSurface = bg;
+        header.style.setProperty('--header-surface', bg);
+      }
     }
 
     // --- guarded state -------------------------------------------------
@@ -128,6 +250,7 @@
     var lastOnLight = null;
     var lastOnFooter = null;
     var lastE = -1;
+    var lastHeaderSurface = '';
 
     function isLightSection(el) {
       // Hero and footer stay out of the light/dark header swap —
@@ -172,6 +295,8 @@
         header.classList.toggle('is-on-footer', onFooter);
       }
 
+      syncMobileHeaderSurface(onLight);
+
       if (!heroText) return;
 
       var t = (y - fadeStart) / fadeRange;
@@ -196,8 +321,16 @@
     measure();
     update();
     onPageScroll(update);
-    window.addEventListener('resize', measure);
+    window.addEventListener('resize', function () {
+      measure();
+      update();
+    });
     window.addEventListener('load', measure);
+    if (typeof mobileBarMq.addEventListener === 'function') {
+      mobileBarMq.addEventListener('change', update);
+    } else if (typeof mobileBarMq.addListener === 'function') {
+      mobileBarMq.addListener(update);
+    }
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(measure);
     }
@@ -1515,6 +1648,8 @@
     }
 
     // Native swipe carousel on mobile; desktop uses sticky drive.
+    // Vertical page scroll stays free; horizontal swipe is handled in JS.
+    bindMobileCarouselTouch(viewport, apNudge);
     viewport.addEventListener('scroll', sync, { passive: true });
     onPageScroll(onWindow);
     window.addEventListener('resize', onResize, { passive: true });
@@ -1598,8 +1733,8 @@
     ).matches;
     var desktopMq = window.matchMedia('(min-width: 961px)');
 
-    /* Sticky scroll-drive is desktop only — mobile uses a native swipe
-       carousel (same pattern as Philosophy). */
+    /* Sticky scroll-drive is desktop only. Mobile uses a transform
+       carousel (no overflow-x:auto) so vertical page scroll stays free. */
     function isScrollDriven() {
       return !!(
         stage &&
@@ -1608,6 +1743,10 @@
         cards.length > 1 &&
         desktopMq.matches
       );
+    }
+
+    function isSwipeCarousel() {
+      return !desktopMq.matches && cards.length > 1;
     }
 
     var drivenX = 0;
@@ -1629,13 +1768,13 @@
     }
 
     function maxScroll() {
-      return isScrollDriven()
-        ? maxTravel()
-        : Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+      if (isScrollDriven() || isSwipeCarousel()) return maxTravel();
+      return Math.max(0, viewport.scrollWidth - viewport.clientWidth);
     }
 
     function positionX() {
-      return isScrollDriven() ? drivenX : viewport.scrollLeft;
+      if (isScrollDriven() || isSwipeCarousel()) return drivenX;
+      return viewport.scrollLeft;
     }
 
     function lastStart() {
@@ -1652,6 +1791,20 @@
       if (index < 0) return 0;
       if (index > last) return last;
       return index;
+    }
+
+    function applySwipeX(x, options) {
+      var animate = !!(options && options.animate);
+      var dragging = !!(options && options.dragging);
+      var max = maxTravel();
+      if (x < 0) x = 0;
+      if (x > max) x = max;
+      drivenX = x;
+      root.classList.toggle('is-swipe-dragging', dragging);
+      track.style.transform =
+        'translate3d(' + (-drivenX).toFixed(2) + 'px,0,0)';
+      if (viewport.scrollLeft !== 0) viewport.scrollLeft = 0;
+      sync();
     }
 
     function sync() {
@@ -1674,11 +1827,26 @@
         root.style.removeProperty('--experience-pin-top');
         root.classList.remove('is-scroll-driven');
         root.classList.remove('is-pin-active');
-        track.style.transform = '';
         pin.style.transform = '';
-        drivenX = 0;
+
+        if (isSwipeCarousel()) {
+          root.classList.add('is-swipe-carousel');
+          viewport.removeAttribute('data-lenis-prevent-horizontal');
+          applySwipeX(drivenX, { animate: false });
+        } else {
+          root.classList.remove('is-swipe-carousel');
+          root.classList.remove('is-swipe-dragging');
+          track.style.transform = '';
+          drivenX = 0;
+          if (!viewport.hasAttribute('data-lenis-prevent-horizontal')) {
+            viewport.setAttribute('data-lenis-prevent-horizontal', '');
+          }
+        }
         return;
       }
+
+      root.classList.remove('is-swipe-carousel');
+      root.classList.remove('is-swipe-dragging');
       pin.style.transform = '';
 
       // Match Philosophy runway speed (~1.43 viewports per card step).
@@ -1748,6 +1916,11 @@
       var left = Math.min(index * step(), maxScroll());
       if (left < 0) left = 0;
 
+      if (isSwipeCarousel()) {
+        applySwipeX(left, { animate: !reduceMotion });
+        return;
+      }
+
       if (!isScrollDriven()) {
         viewport.scrollTo({
           left: left,
@@ -1786,9 +1959,14 @@
     }
 
     function onResize() {
+      var keepIndex = currentIndex();
       measurePin();
       applyScrollDrive();
-      sync();
+      if (isSwipeCarousel()) {
+        applySwipeX(keepIndex * step(), { animate: false });
+      } else {
+        sync();
+      }
     }
 
     /* -- autoplay (off while sticky runway owns the slider) ------------ */
@@ -1848,6 +2026,65 @@
         go(1);
       });
     }
+
+    /* Mobile swipe: claim only clearly horizontal gestures; vertical
+       always chains to the page (viewport is overflow:hidden). */
+    (function bindSwipe() {
+      var startX = 0;
+      var startY = 0;
+      var originX = 0;
+      var axis = null;
+
+      viewport.addEventListener(
+        'touchstart',
+        function (event) {
+          if (!isSwipeCarousel() || event.touches.length !== 1) return;
+          startX = event.touches[0].clientX;
+          startY = event.touches[0].clientY;
+          originX = drivenX;
+          axis = null;
+        },
+        { passive: true },
+      );
+
+      viewport.addEventListener(
+        'touchmove',
+        function (event) {
+          if (!isSwipeCarousel() || event.touches.length !== 1) return;
+          if (axis === 'v') return;
+
+          var x = event.touches[0].clientX;
+          var y = event.touches[0].clientY;
+          var dx = x - startX;
+          var dy = y - startY;
+
+          if (axis === null) {
+            if (Math.abs(dx) < 10 && Math.abs(dy) < 10) return;
+            axis = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+            if (axis === 'v') return;
+            apNudge();
+          }
+
+          if (axis === 'h' && event.cancelable) {
+            event.preventDefault();
+            applySwipeX(originX - dx, { dragging: true });
+          }
+        },
+        { passive: false },
+      );
+
+      function endSwipe() {
+        if (!isSwipeCarousel() || axis !== 'h') {
+          axis = null;
+          return;
+        }
+        axis = null;
+        goTo(currentIndex());
+      }
+
+      viewport.addEventListener('touchend', endSwipe, { passive: true });
+      viewport.addEventListener('touchcancel', endSwipe, { passive: true });
+    })();
 
     viewport.addEventListener('scroll', sync, { passive: true });
     onPageScroll(onWindow);

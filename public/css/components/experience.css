@@ -159,6 +159,8 @@
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
+  touch-action: pan-x pan-y;
   container-type: inline-size;
 }
 
@@ -282,7 +284,8 @@
 }
 
 @media (max-width: 960px) {
-  /* Mobile: normal flow + swipe carousel — no sticky runway. */
+  /* Mobile: normal flow + transform carousel — no nested overflow scroll
+     (overflow-x:auto was trapping vertical page scroll on touch). */
   .experience {
     --experience-visible: 1;
     --experience-section-pad: var(--section-padding-tight);
@@ -299,14 +302,18 @@
     min-height: 0;
   }
 
+  .experience__viewport,
   .experience.is-scroll-driven .experience__viewport {
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
+    overflow: hidden;
+    scroll-snap-type: none;
+    touch-action: pan-y;
+    overscroll-behavior: auto;
+    -webkit-overflow-scrolling: auto;
   }
 
-  .experience.is-scroll-driven .experience__track {
-    will-change: auto;
-    transform: none !important;
+  .experience.is-scroll-driven .experience__track,
+  .experience.is-swipe-carousel .experience__track {
+    will-change: transform;
   }
 
   .experience__copy {
@@ -339,9 +346,15 @@
     padding-left: var(--content-gutter);
     padding-right: var(--content-gutter);
     gap: var(--space-4);
+    transition: transform 0.45s var(--ease-editorial);
+  }
+
+  .experience.is-swipe-dragging .experience__track {
+    transition: none;
   }
 
   .experience-card {
     flex-basis: calc(100vw - var(--content-gutter) * 2 - 2.75rem);
+    scroll-snap-align: none;
   }
 }

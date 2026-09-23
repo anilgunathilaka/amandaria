@@ -160,6 +160,8 @@
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-x: contain;
+  overscroll-behavior-y: auto;
+  touch-action: pan-x pan-y;
 }
 
 .sanctuary-slider__viewport::-webkit-scrollbar {
@@ -303,6 +305,12 @@
   .sanctuary.is-scroll-driven .sanctuary-slider__track {
     will-change: auto;
     transform: none !important;
+  }
+
+  .sanctuary-slider__viewport {
+    /* Vertical page scroll always wins; JS handles horizontal swipe. */
+    touch-action: pan-y;
+    overscroll-behavior-y: auto;
   }
 
   .sanctuary-card__label {

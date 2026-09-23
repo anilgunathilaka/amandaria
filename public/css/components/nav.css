@@ -204,14 +204,18 @@
 }
 
 @media (max-width: 720px) {
-  /* Solid header bar on mobile so chrome never sits on top of page copy. */
+  /* Solid header bar on mobile — color tracks the section under it
+     via --header-surface (set in initHeaderScroll). */
   .site-header {
-    background: var(--color-surface);
+    background: var(--header-surface, var(--color-surface));
     box-shadow: 0 1px 0 color-mix(in srgb, var(--color-text) 12%, transparent);
+    transition:
+      background-color var(--duration-base) var(--ease-editorial),
+      box-shadow var(--duration-base) var(--ease-editorial);
   }
 
   .site-header.is-on-light {
-    background: var(--color-surface-light);
+    background: var(--header-surface, var(--color-surface-light));
     box-shadow: 0 1px 0 color-mix(in srgb, var(--color-on-light) 10%, transparent);
   }
 
