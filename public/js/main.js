@@ -800,22 +800,36 @@
     function apply() {
       if (!desktopMq.matches) return;
 
-      var rect = stage.getBoundingClientRect();
-      var viewH = window.innerHeight || pinH || 1;
+      var viewH =
+        (window.visualViewport && window.visualViewport.height) ||
+        window.innerHeight ||
+        pinH ||
+        1;
       var viewW = window.innerWidth;
+      var rect = stage.getBoundingClientRect();
+      var pinRect = pin.getBoundingClientRect();
       var stageTop = rect.top;
       var stageBottom = rect.bottom;
 
+      // Prefer pin’s sticky top for progress when it is actually stuck —
+      // Safari + Lenis can desync stage rect vs sticky hold.
+      var pinned =
+        pinRect.top <= 1 &&
+        stageBottom > pinRect.height + 1 &&
+        stageTop < 1;
+
       // Entry: scale intro while the stage rises into view.
-      // Pin: scrub only while the sticky frame is actually holding —
-      // same top/bottom gate the hero expand uses.
+      // Pin: scrub only while the sticky frame is actually holding.
       var entryP = clamp01((viewH - stageTop) / viewH);
       var pinP = 0;
 
-      if (stageTop <= 0 && stageBottom > pinH) {
+      if (pinned) {
         pinP = clamp01(-stageTop / scrollSpan);
       } else if (stageBottom <= pinH) {
         pinP = 1;
+      } else if (stageTop <= 0 && stageBottom > pinH) {
+        // Fallback when sticky metrics lag (older WebKit).
+        pinP = clamp01(-stageTop / scrollSpan);
       }
 
       // Pinned beats: delay → transition → carousel → white wipe → copy → release.
@@ -893,7 +907,9 @@
         slideX = cardX(0) - p4 * (slideCards.length - 1) * step;
         captionOpacity = 1;
       } else if (imageP > 0) {
-        introOpacity = 1 - easeProgress(imageP / 0.55);
+        // Keep the intro title readable while it exits — fade only once
+        // it is mostly off-screen (Safari was dropping glyphs early).
+        introOpacity = 1 - easeProgress(Math.max(0, (textP - 0.45) / 0.5));
         captionOpacity = easeProgress(imageP / 0.72);
       } else if (pinP >= TRANS_END) {
         introOpacity = 1 - easeProgress((pinP - TRANS_END) / 0.08);
@@ -938,15 +954,11 @@
         pinP >= DELAY_END && pinP < TRANS_END,
       );
 
-      section.classList.toggle(
-        'is-photo',
-        imageP > 0.2 && pCopy < 0.12,
-      );
-      // White intro / copy = light chrome; photo carousel = dark chrome.
-      section.classList.toggle(
-        'section--light',
-        !(imageP > 0.2 && pCopy < 0.12),
-      );
+      // Photo chrome only after the intro title has left the white field —
+      // switching earlier painted the title white-on-white (looked “hidden”).
+      var photoChrome = imageP > 0.55 && textP > 0.55 && pCopy < 0.12;
+      section.classList.toggle('is-photo', photoChrome);
+      section.classList.toggle('section--light', !photoChrome);
       section.classList.toggle('is-copy-phase', copyOpacity > 0.02);
 
       if (imageP > 0 || pinP >= CAROUSEL_START) {
@@ -1236,11 +1248,20 @@
     var reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
+    var desktopMq = window.matchMedia('(min-width: 961px)');
 
-    /* Real position:sticky on .sanctuary__pin (requires #main without
-       overflow). Scroll progress across the stage runway drives the
-       track — no translateY fake-pin (that caused the release jump). */
-    var scrollDriven = !!(stage && pin && !reduceMotion && cards.length > 1);
+    /* Sticky scroll-drive is desktop only — on mobile a native swipe
+       carousel is clearer and avoids the tall runway / header clashes. */
+    function isScrollDriven() {
+      return !!(
+        stage &&
+        pin &&
+        !reduceMotion &&
+        cards.length > 1 &&
+        desktopMq.matches
+      );
+    }
+
     var drivenX = 0;
     var pinSpan = 1;
 
@@ -1260,13 +1281,13 @@
     }
 
     function maxScroll() {
-      return scrollDriven
+      return isScrollDriven()
         ? maxTravel()
         : Math.max(0, viewport.scrollWidth - viewport.clientWidth);
     }
 
     function positionX() {
-      return scrollDriven ? drivenX : viewport.scrollLeft;
+      return isScrollDriven() ? drivenX : viewport.scrollLeft;
     }
 
     function currentIndex() {
@@ -1299,11 +1320,13 @@
     }
 
     function measurePin() {
-      if (!scrollDriven) {
+      if (!isScrollDriven()) {
         stage.style.height = '';
         root.style.removeProperty('--sanctuary-pin-top');
         root.classList.remove('is-scroll-driven');
+        root.classList.remove('is-pin-active');
         track.style.transform = '';
+        pin.style.transform = '';
         drivenX = 0;
         return;
       }
@@ -1331,7 +1354,7 @@
     }
 
     function pinProgress() {
-      if (!scrollDriven) return 0;
+      if (!isScrollDriven()) return 0;
       var pinH = pin.offsetHeight || 1;
       var span = Math.max(stage.offsetHeight - pinH, 1);
       pinSpan = span;
@@ -1341,7 +1364,7 @@
     }
 
     function applyScrollDrive() {
-      if (!scrollDriven) return;
+      if (!isScrollDriven()) return;
 
       var max = maxTravel();
       if (max <= 2) {
@@ -1382,7 +1405,7 @@
       var left = Math.min(index * step(), maxScroll());
       if (left < 0) left = 0;
 
-      if (!scrollDriven) {
+      if (!isScrollDriven()) {
         viewport.scrollTo({
           left: left,
           behavior: reduceMotion ? 'auto' : 'smooth',
@@ -1444,7 +1467,7 @@
     function apCanRun() {
       // Never autoplay while the sticky runway is active — scroll owns it.
       var inRunway =
-        scrollDriven &&
+        isScrollDriven() &&
         stage.getBoundingClientRect().top < window.innerHeight * 0.5 &&
         stage.getBoundingClientRect().bottom > window.innerHeight * 0.5;
       return (
@@ -1491,11 +1514,15 @@
       });
     }
 
-    if (!scrollDriven) {
-      viewport.addEventListener('scroll', sync, { passive: true });
-    }
+    // Native swipe carousel on mobile; desktop uses sticky drive.
+    viewport.addEventListener('scroll', sync, { passive: true });
     onPageScroll(onWindow);
     window.addEventListener('resize', onResize, { passive: true });
+    if (typeof desktopMq.addEventListener === 'function') {
+      desktopMq.addEventListener('change', onResize);
+    } else if (typeof desktopMq.addListener === 'function') {
+      desktopMq.addListener(onResize);
+    }
 
     measurePin();
     applyScrollDrive();
@@ -1569,10 +1596,20 @@
     var reduceMotion = window.matchMedia(
       '(prefers-reduced-motion: reduce)',
     ).matches;
+    var desktopMq = window.matchMedia('(min-width: 961px)');
 
-    /* Same sticky runway pattern as sanctuary: page scroll across the
-       stage maps to horizontal track travel; sticky releases when done. */
-    var scrollDriven = !!(stage && pin && !reduceMotion && cards.length > 1);
+    /* Sticky scroll-drive is desktop only — mobile uses a native swipe
+       carousel (same pattern as Philosophy). */
+    function isScrollDriven() {
+      return !!(
+        stage &&
+        pin &&
+        !reduceMotion &&
+        cards.length > 1 &&
+        desktopMq.matches
+      );
+    }
+
     var drivenX = 0;
     var pinSpan = 1;
 
@@ -1592,13 +1629,13 @@
     }
 
     function maxScroll() {
-      return scrollDriven
+      return isScrollDriven()
         ? maxTravel()
         : Math.max(0, viewport.scrollWidth - viewport.clientWidth);
     }
 
     function positionX() {
-      return scrollDriven ? drivenX : viewport.scrollLeft;
+      return isScrollDriven() ? drivenX : viewport.scrollLeft;
     }
 
     function lastStart() {
@@ -1632,11 +1669,13 @@
     }
 
     function measurePin() {
-      if (!scrollDriven) {
+      if (!isScrollDriven()) {
         stage.style.height = '';
         root.style.removeProperty('--experience-pin-top');
         root.classList.remove('is-scroll-driven');
+        root.classList.remove('is-pin-active');
         track.style.transform = '';
+        pin.style.transform = '';
         drivenX = 0;
         return;
       }
@@ -1661,7 +1700,7 @@
     }
 
     function pinProgress() {
-      if (!scrollDriven) return 0;
+      if (!isScrollDriven()) return 0;
       var pinH = pin.offsetHeight || 1;
       var span = Math.max(stage.offsetHeight - pinH, 1);
       pinSpan = span;
@@ -1670,7 +1709,7 @@
     }
 
     function applyScrollDrive() {
-      if (!scrollDriven) return;
+      if (!isScrollDriven()) return;
 
       var max = maxTravel();
       if (max <= 2) {
@@ -1709,7 +1748,7 @@
       var left = Math.min(index * step(), maxScroll());
       if (left < 0) left = 0;
 
-      if (!scrollDriven) {
+      if (!isScrollDriven()) {
         viewport.scrollTo({
           left: left,
           behavior: reduceMotion ? 'auto' : 'smooth',
@@ -1763,7 +1802,7 @@
 
     function apCanRun() {
       var inRunway =
-        scrollDriven &&
+        isScrollDriven() &&
         stage.getBoundingClientRect().top < window.innerHeight * 0.5 &&
         stage.getBoundingClientRect().bottom > window.innerHeight * 0.5;
       return (
@@ -1810,11 +1849,14 @@
       });
     }
 
-    if (!scrollDriven) {
-      viewport.addEventListener('scroll', sync, { passive: true });
-    }
+    viewport.addEventListener('scroll', sync, { passive: true });
     onPageScroll(onWindow);
     window.addEventListener('resize', onResize, { passive: true });
+    if (typeof desktopMq.addEventListener === 'function') {
+      desktopMq.addEventListener('change', onResize);
+    } else if (typeof desktopMq.addListener === 'function') {
+      desktopMq.addListener(onResize);
+    }
 
     measurePin();
     applyScrollDrive();

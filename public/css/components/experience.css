@@ -282,13 +282,31 @@
 }
 
 @media (max-width: 960px) {
+  /* Mobile: normal flow + swipe carousel — no sticky runway. */
   .experience {
     --experience-visible: 1;
+    --experience-section-pad: var(--section-padding-tight);
+  }
+
+  .experience__stage {
+    height: auto !important;
   }
 
   .experience__pin {
+    position: static;
+    top: auto;
     grid-template-columns: 1fr;
     min-height: 0;
+  }
+
+  .experience.is-scroll-driven .experience__viewport {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .experience.is-scroll-driven .experience__track {
+    will-change: auto;
+    transform: none !important;
   }
 
   .experience__copy {
@@ -302,13 +320,28 @@
     max-width: none;
   }
 
+  .experience__body {
+    margin-left: 0;
+  }
+
   .experience__slider {
-    height: min(72vh, 640px);
+    height: min(68vh, 560px);
     padding-top: 0;
-    padding-bottom: var(--section-padding-tight);
+    padding-bottom: calc(var(--section-padding-tight) + var(--experience-time-row));
+  }
+
+  .experience__viewport {
+    height: 100%;
+    padding-bottom: var(--experience-time-row);
   }
 
   .experience__track {
     padding-left: var(--content-gutter);
+    padding-right: var(--content-gutter);
+    gap: var(--space-4);
+  }
+
+  .experience-card {
+    flex-basis: calc(100vw - var(--content-gutter) * 2 - 2.75rem);
   }
 }

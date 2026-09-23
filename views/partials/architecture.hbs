@@ -7,14 +7,16 @@
 
   <div class="architecture__stage" data-architecture-stage>
     <div class="architecture__pin">
-      <div class="architecture__white-panel">
-        <div class="architecture__sheet" aria-hidden="true"></div>
+      <div class="architecture__white-panel" aria-hidden="true">
+        <div class="architecture__sheet"></div>
+      </div>
 
-        <div class="architecture__copy" data-architecture-copy aria-hidden="true">
-          <div class="architecture__body">
-            <p class="statement">{{architecture.statement}}</p>
-            <p class="body-text">{{architecture.body}}</p>
-          </div>
+      {{! Copy is a sibling of the translating sheet — Safari collapses
+          multi-line text inside ancestors that use transform. }}
+      <div class="architecture__copy" data-architecture-copy aria-hidden="true">
+        <div class="architecture__body">
+          <p class="statement">{{architecture.statement}}</p>
+          <p class="body-text">{{architecture.body}}</p>
         </div>
       </div>
 
@@ -52,10 +54,12 @@
       </div>
 
       <div class="architecture__intro-frame" data-architecture-intro-frame>
-        <span class="eyebrow eyebrow--center">{{architecture.eyebrow}}</span>
-        <p class="architecture__intro-display heading-display" aria-hidden="true">
-          {{#each architecture.introHeadingLines}}{{this}}{{#unless @last}}<br />{{/unless}}{{/each}}
-        </p>
+        <div class="architecture__intro-scale">
+          <span class="eyebrow eyebrow--center">{{architecture.eyebrow}}</span>
+          <p class="architecture__intro-display heading-display" aria-hidden="true">
+            {{#each architecture.introHeadingLines}}{{this}}{{#unless @last}}<br />{{/unless}}{{/each}}
+          </p>
+        </div>
       </div>
 
       <div class="architecture__caption" data-architecture-caption-wrap>

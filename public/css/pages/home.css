@@ -66,7 +66,9 @@
 }
 
 #sanctuary {
-  z-index: 5;
+  /* Keep auto stacking — a raised z-index makes the sticky Philosophy
+     pin paint over the next section in Safari while releasing. */
+  z-index: auto;
 }
 
 #aranya {
@@ -92,4 +94,22 @@
 #inquiry,
 #footer {
   scroll-margin-top: -2px;
+}
+
+/* Mobile: fixed header covers the top of sections — offset anchors so
+   titles/copy are not hidden under MENU / logo / INQUIRE. Desktop unchanged. */
+@media (max-width: 720px) {
+  #brand,
+  #sanctuary,
+  #destination,
+  #architecture,
+  #aranya,
+  #experience,
+  #culinary,
+  #privacy,
+  #final-cta,
+  #inquiry,
+  #footer {
+    scroll-margin-top: var(--header-height);
+  }
 }

@@ -15,7 +15,7 @@
   --architecture-backdrop-x: 100%;
   --architecture-slide-x: 100%;
   --architecture-card-w: clamp(300px, 42vw, 640px);
-  --architecture-card-h: clamp(460px, 82svh, 820px);
+  --architecture-card-h: clamp(460px, 82vh, 820px);
   --architecture-card-gap: clamp(28px, 4vw, 52px);
   --architecture-caption-opacity: 0;
   --architecture-intro-opacity: 1;
@@ -23,8 +23,8 @@
   --architecture-slides-opacity: 1;
   position: relative;
   padding: 0;
-  /* Clip sideways travel; clip (not hidden) keeps sticky descendants working. */
-  overflow-x: clip;
+  /* Do not set overflow-x here — Safari breaks position:sticky on any
+     non-visible overflow ancestor. Horizontal travel is clipped on the pin. */
   isolation: isolate;
   background: var(--color-surface-light);
 }
@@ -36,14 +36,18 @@
 .architecture__stage {
   position: relative;
   z-index: 2;
-  height: calc(100svh + var(--architecture-pin-extra));
+  /* vh first (Safari-stable); dvh when supported for mobile chrome. */
+  height: calc(100vh + var(--architecture-pin-extra));
+  height: calc(100dvh + var(--architecture-pin-extra));
 }
 
 .architecture__pin {
   position: sticky;
   top: 0;
-  height: 100svh;
-  min-height: 100svh;
+  height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
+  min-height: 100dvh;
   overflow: hidden;
 }
 
@@ -52,13 +56,14 @@
   overflow: hidden;
 }
 
+/* Wrapper only — transform lives on .architecture__sheet so wipe copy
+   text is never a descendant of a translating layer (Safari glyph bug). */
 .architecture__white-panel {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  will-change: transform;
-  transform: translate3d(var(--architecture-white-x), 0, 0);
+  overflow: hidden;
 }
 
 .architecture.is-copy-phase .architecture__white-panel {
@@ -69,6 +74,8 @@
   position: absolute;
   inset: 0;
   background: var(--color-surface-light);
+  will-change: transform;
+  transform: translate3d(var(--architecture-white-x), 0, 0);
 }
 
 .architecture__slides {
@@ -186,35 +193,39 @@
   --color-text-muted: var(--color-on-light-muted);
   opacity: var(--architecture-intro-opacity);
   pointer-events: none;
+  /* Translate only — never scale this text layer (Safari collapses glyphs). */
   will-change: transform, opacity;
   transform: translate(
-      calc(-50% + var(--architecture-intro-x)),
-      calc(-50% + var(--architecture-intro-y))
-    )
-    scale(var(--architecture-intro-scale));
+    calc(-50% + var(--architecture-intro-x)),
+    calc(-50% + var(--architecture-intro-y))
+  );
 }
 
-.architecture.is-photo .architecture__intro-frame {
-  color: var(--color-surface-light);
-  --color-text: var(--color-surface-light);
-  --color-text-muted: color-mix(in srgb, var(--color-surface-light) 72%, transparent);
+/* Size the intro via font-size (not transform:scale) so WebKit keeps
+   painting the display title while the section scrolls. */
+.architecture__intro-scale {
+  display: block;
 }
 
 .architecture__intro-frame .eyebrow {
   white-space: nowrap;
+  font-size: calc(var(--text-eyebrow) * var(--architecture-intro-scale));
 }
 
 .architecture__intro-display {
-  margin-top: var(--space-5);
+  margin-top: calc(var(--space-5) * var(--architecture-intro-scale));
+  font-size: calc(var(--text-display) * var(--architecture-intro-scale));
   line-height: var(--leading-tight);
 }
 
-/* HTML text on the white panel — full width, centered on the page. */
+/* Wipe copy — sibling of the sheet (not inside a translating layer).
+   Grid-centered with no transform so Safari does not collapse glyphs. */
 .architecture__copy {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  z-index: 1;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
   width: 100%;
   padding-inline: var(--content-gutter);
   text-align: center;
@@ -222,8 +233,13 @@
   --color-text: var(--color-on-light);
   --color-text-muted: var(--color-on-light-muted);
   opacity: var(--architecture-copy-opacity);
-  transform: translate(-50%, -50%);
   pointer-events: none;
+  /* Match the sheet’s leading edge: hide glyphs until the wipe covers them. */
+  clip-path: inset(0 0 0 max(0px, var(--architecture-white-x)));
+}
+
+.architecture.is-copy-phase .architecture__copy {
+  z-index: 5;
 }
 
 .architecture__copy .architecture__body {

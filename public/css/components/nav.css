@@ -204,6 +204,24 @@
 }
 
 @media (max-width: 720px) {
+  /* Solid header bar on mobile so chrome never sits on top of page copy. */
+  .site-header {
+    background: var(--color-surface);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--color-text) 12%, transparent);
+  }
+
+  .site-header.is-on-light {
+    background: var(--color-surface-light);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--color-on-light) 10%, transparent);
+  }
+
+  /* Logo stays visible with the bar (not only after scroll). */
+  .site-header__logo {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
   .site-header__actions {
     gap: 12px;
   }

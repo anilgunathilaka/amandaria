@@ -251,14 +251,69 @@
 }
 
 @media (max-width: 960px) {
+  /* Mobile: normal document flow + swipe carousel — no sticky runway. */
+  .sanctuary.section {
+    padding-block: var(--section-padding-tight);
+  }
+
+  .sanctuary__stage {
+    height: auto !important;
+  }
+
+  .sanctuary__pin {
+    position: static;
+    top: auto;
+  }
+
   .sanctuary-slider__intro {
     flex-direction: column;
     align-items: flex-start;
+    gap: var(--space-5);
+  }
+
+  /* Intro stays visible on mobile (no pin-hide). */
+  .sanctuary.is-pin-active .sanctuary-slider__intro .section-intro {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .sanctuary-slider__toolbar {
+    justify-content: flex-start;
+    margin: var(--space-5) 0 var(--space-3);
+    padding-inline: var(--content-gutter);
   }
 
   .sanctuary-slider {
+    --sanctuary-start: var(--content-gutter);
+    --sanctuary-gap: var(--space-4);
+    /* One card + a clear peek of the next. */
     --sanctuary-card-width: calc(
-      (100% - var(--sanctuary-start) - var(--sanctuary-gap)) / 1.5
+      100vw - var(--content-gutter) * 2 - 2.75rem
     );
+    margin-top: 0;
+    overflow-x: visible;
+  }
+
+  .sanctuary.is-scroll-driven .sanctuary-slider__viewport {
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  .sanctuary.is-scroll-driven .sanctuary-slider__track {
+    will-change: auto;
+    transform: none !important;
+  }
+
+  .sanctuary-card__label {
+    margin-top: var(--space-4);
+  }
+
+  .sanctuary-card__title {
+    margin-top: var(--space-2);
+  }
+
+  .sanctuary-card__body {
+    margin-top: var(--space-3);
   }
 }

@@ -1,13 +1,13 @@
 /**
  * Typography tokens: font stacks + a fluid type scale.
  *
- * Cinzel Decorative (display) for primary headings — the AMANDARIA
- * lockup. Playfair Display (serif) for secondary headings and
- * editorial asides. Manrope (sans) for nav, labels, body and buttons.
+ * Aboreto (display) for primary headings. Playfair Display (serif)
+ * for secondary headings and editorial asides. Manrope (sans) for
+ * nav, labels, body and buttons.
  */
 
 :root {
-  --font-display: 'Cinzel Decorative', Cinzel, Georgia, serif;
+  --font-display: 'Aboreto', Georgia, serif;
   --font-serif: 'Playfair Display', 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
   --font-sans: 'Manrope', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
 
@@ -29,7 +29,7 @@
   --leading-normal: 1.7;
   --leading-relaxed: 1.85;
 
-  --tracking-display: 0.04em;
+  --tracking-display: -0.02em;
   --tracking-label: 0.22em;
   --tracking-eyebrow: 0.32em;
   --tracking-nav: 0.14em;
