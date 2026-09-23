@@ -18,6 +18,7 @@
  *  14. Absolute Privacy hold-and-grow reveal
  *  15. Footer wordmark -> logo lockup (closing reveal)
  *  16. Final CTA: text runs at 200% speed over a static image
+ *  17. Page loader (boot screen until assets ready)
  *
  * No frontend framework, no JS build step — files in public/ are served as-is.
  * Lenis is vendored at /js/vendor/lenis.min.js (see package.json "lenis").
@@ -2114,6 +2115,69 @@
   }
 
   /* ------------------------------------------------------------------ */
+  /* 17. Page loader — hold until window load + fonts, then fade out     */
+  /* ------------------------------------------------------------------ */
+
+  function initPageLoader() {
+    var root = document.documentElement;
+    var loader = document.querySelector('[data-page-loader]');
+    if (!loader) {
+      root.classList.remove('is-loading');
+      root.classList.add('is-ready');
+      return;
+    }
+
+    var reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    var minMs = reduceMotion ? 0 : 700;
+    var maxMs = 10000;
+    var startedAt = Date.now();
+    var finished = false;
+
+    function dismiss() {
+      if (finished) return;
+      finished = true;
+
+      var elapsed = Date.now() - startedAt;
+      var wait = Math.max(0, minMs - elapsed);
+
+      window.setTimeout(function () {
+        loader.classList.add('is-done');
+        loader.setAttribute('aria-busy', 'false');
+        root.classList.add('is-ready');
+        root.classList.remove('is-loading');
+
+        var fadeMs = reduceMotion ? 0 : 700;
+        window.setTimeout(function () {
+          if (loader.parentNode) loader.parentNode.removeChild(loader);
+        }, fadeMs);
+      }, wait);
+    }
+
+    function onAssetsReady() {
+      var fontsReady =
+        document.fonts && document.fonts.ready
+          ? document.fonts.ready.then(
+              function () {},
+              function () {},
+            )
+          : Promise.resolve();
+
+      Promise.resolve(fontsReady).then(dismiss);
+    }
+
+    if (document.readyState === 'complete') {
+      onAssetsReady();
+    } else {
+      window.addEventListener('load', onAssetsReady, { once: true });
+    }
+
+    // Never leave visitors stuck if a resource hangs.
+    window.setTimeout(dismiss, maxMs);
+  }
+
+  /* ------------------------------------------------------------------ */
   /* Boot                                                                  */
   /* ------------------------------------------------------------------ */
 
@@ -2130,6 +2194,7 @@
   }
 
   function init() {
+    safeInit('initPageLoader', initPageLoader);
     safeInit('initLenis', initLenis);
     safeInit('initHeaderScroll', initHeaderScroll);
     safeInit('initMobileMenu', initMobileMenu);

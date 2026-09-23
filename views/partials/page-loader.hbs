@@ -1,0 +1,22 @@
+{{! Full-page boot loader — covers the viewport until assets are ready. }}
+<div
+  class="page-loader"
+  data-page-loader
+  role="status"
+  aria-live="polite"
+  aria-busy="true"
+  aria-label="Loading"
+>
+  <div class="page-loader__inner">
+    <img
+      class="page-loader__mark"
+      src="{{nav.logoIconSrc}}"
+      alt=""
+      width="64"
+      height="64"
+      decoding="async"
+    />
+    <span class="page-loader__bar" aria-hidden="true"></span>
+    <span class="page-loader__label">Loading</span>
+  </div>
+</div>

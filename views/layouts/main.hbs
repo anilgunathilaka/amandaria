@@ -1,20 +1,23 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="is-loading">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{meta.title}}</title>
   <meta name="description" content="{{meta.description}}" />
   <link rel="icon" type="image/png" href="/favicon.png" />
+  {{! Critical FOUC guard — navy before stylesheet cascade arrives. }}
+  <style>html.is-loading{background:#163e55}</style>
   {{> head-styles}}
 </head>
 <body>
+  {{> page-loader}}
   <a class="skip-link" href="#main">Skip to content</a>
 
   {{{body}}}
 
   <div class="grain-overlay" aria-hidden="true"></div>
   <script src="/js/vendor/lenis.min.js" defer></script>
-  <script src="/js/main.js?v=sanctuary-noprog1" defer></script>
+  <script src="/js/main.js?v=loader1" defer></script>
 </body>
 </html>
