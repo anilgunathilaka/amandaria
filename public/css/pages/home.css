@@ -71,7 +71,19 @@
     margin-bottom: 0;
   }
 
-  #aranya {
+  /* Philosophy + Aranya: keep the dark blue surface — no light/alt flip. */
+  #sanctuary,
+  #sanctuary.section--light,
+  #sanctuary.section--alt,
+  #aranya,
+  #aranya.section--light,
+  #aranya.section--alt {
+    background: var(--color-surface-alt);
+    color: unset;
+    --color-text: unset;
+    --color-text-muted: unset;
+    --color-line: unset;
+    --color-line-strong: unset;
     transition: none;
   }
 }

@@ -1301,6 +1301,9 @@
 
     function apply() {
       if (window.innerWidth <= 960) {
+        // Mobile: lock dark blue — do not flip to section--light.
+        section.classList.remove('section--light');
+        section.classList.add('section--alt');
         if (media) media.style.transform = '';
         return;
       }
@@ -1517,9 +1520,12 @@
     }
 
     function syncTheme() {
-      // Mobile: skip mid-scroll theme flips — the 0.65s background
-      // transition reads as “slow scroll” while dragging the page.
-      if (!desktopMq.matches) return;
+      // Mobile: lock the dark blue surface — no light ↔ alt flip.
+      if (!desktopMq.matches) {
+        root.classList.remove('section--light');
+        root.classList.add('section--alt');
+        return;
+      }
       var dark = root.getBoundingClientRect().top <= window.innerHeight / 2;
       root.classList.toggle('section--light', !dark);
       root.classList.toggle('section--alt', dark);
