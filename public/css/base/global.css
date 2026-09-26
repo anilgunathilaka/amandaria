@@ -20,6 +20,20 @@ html.lenis {
   scroll-behavior: auto;
 }
 
+/* Mobile: native scroll only (no CSS smooth, no Lenis). */
+@media (max-width: 960px) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Mid-scroll theme flips must not ease — they read as laggy scroll. */
+  .section,
+  .sanctuary,
+  #aranya {
+    transition: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

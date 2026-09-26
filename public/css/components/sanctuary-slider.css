@@ -253,7 +253,8 @@
 }
 
 @media (max-width: 960px) {
-  /* Mobile: normal document flow + swipe carousel — no sticky runway. */
+  /* Mobile: normal document flow + transform drag carousel — no sticky
+     runway, no nested overflow-x (keeps vertical page scroll free). */
   .sanctuary.section {
     padding-block: var(--section-padding-tight);
   }
@@ -282,7 +283,7 @@
 
   .sanctuary-slider__toolbar {
     justify-content: flex-start;
-    margin: var(--space-5) 0 var(--space-3);
+    margin: var(--space-5) 0 20px;
     padding-inline: var(--content-gutter);
   }
 
@@ -297,20 +298,27 @@
     overflow-x: visible;
   }
 
+  .sanctuary-slider__viewport,
   .sanctuary.is-scroll-driven .sanctuary-slider__viewport {
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-  }
-
-  .sanctuary.is-scroll-driven .sanctuary-slider__track {
-    will-change: auto;
-    transform: none !important;
-  }
-
-  .sanctuary-slider__viewport {
-    /* Vertical page scroll always wins; JS handles horizontal swipe. */
+    overflow: hidden;
+    scroll-snap-type: none;
     touch-action: pan-y;
-    overscroll-behavior-y: auto;
+    overscroll-behavior: auto;
+    -webkit-overflow-scrolling: auto;
+  }
+
+  .sanctuary.is-scroll-driven .sanctuary-slider__track,
+  .sanctuary.is-swipe-carousel .sanctuary-slider__track {
+    will-change: transform;
+    transition: transform 0.45s var(--ease-editorial);
+  }
+
+  .sanctuary.is-swipe-dragging .sanctuary-slider__track {
+    transition: none;
+  }
+
+  .sanctuary-card {
+    scroll-snap-align: none;
   }
 
   .sanctuary-card__label {

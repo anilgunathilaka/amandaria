@@ -331,6 +331,10 @@
     margin-left: 0;
   }
 
+  .experience__controls {
+    margin-bottom: 20px;
+  }
+
   .experience__slider {
     height: min(68vh, 560px);
     padding-top: 0;

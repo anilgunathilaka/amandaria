@@ -65,6 +65,17 @@
   margin-bottom: calc(100svh - var(--outro-gap));
 }
 
+@media (max-width: 960px) {
+  /* Desktop outro runway is ~1 viewport — too long for mobile scroll feel. */
+  .site-footer {
+    margin-bottom: 0;
+  }
+
+  #aranya {
+    transition: none;
+  }
+}
+
 #sanctuary {
   /* Keep auto stacking — a raised z-index makes the sticky Philosophy
      pin paint over the next section in Safari while releasing. */
